@@ -76,7 +76,7 @@
                                     <resources>
                                         <resource>
                                             <directory>/home/pi/web/armnode</directory>
-                                            <filtering>true</filtering>
+                                            <filtering>false</filtering>
                                         </resource>
                                     </resources>
                                 </configuration>
