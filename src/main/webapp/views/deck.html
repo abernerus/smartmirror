@@ -1,0 +1,13 @@
+<div class="container-fluid">
+
+    <div class="row">
+        <div ng-repeat="n in cards track by $index">
+            <div class="col-xs-4">
+                <a href="#card/{{n}}">
+                    <div ng-include="'views/card.html'" ng-controller='CardController' ng-init='includeWithNumber(n)'></div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>

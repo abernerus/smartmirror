@@ -1,0 +1,24 @@
+<div class="card">
+
+    <div ng-switch on="cardNumber">
+        <div ng-switch-when="COFFEE">
+            <div class="number coffee">
+                <i class="fa fa-coffee"></i>
+            </div>
+        </div>
+        <div ng-switch-when="INFINITY">
+            <div class="number infinity">&infin;</div>
+        </div>
+        <div ng-switch-when="UNKNOWN">
+            <div class="number">
+                ?
+            </div>
+        </div>
+        <div ng-switch-default>
+            <div class="number">
+                {{cardNumber}}
+            </div>
+        </div>
+    </div>
+
+</div>
