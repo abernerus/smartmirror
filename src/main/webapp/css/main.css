@@ -1,0 +1,9 @@
+body.smartmirror-body {
+  background-color: black;
+  color: #ffffff;
+}
+.clock {
+  font-size: 64px;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: lighter;
+}

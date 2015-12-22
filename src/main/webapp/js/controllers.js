@@ -1,26 +1,13 @@
-var scrumpokerControllers = angular.module('scrumpokerControllers', []);
+var smartMirrorControllers = angular.module('smartMirrorControllers', []);
 
-scrumpokerControllers.controller('DeckController', ['$scope', '$anchorScroll', '$timeout',
-  function ($scope, $anchorScroll, $timeout) {
+smartMirrorControllers.controller('DashController', ['$scope', '$interval',
+  function ($scope, $interval) {
     $scope.test = 'hello';
-    $scope.cards = ["0", "1/2", "1", "2", "3", "5", "8", "13", "20", "40", "100", "INFINITY", "UNKNOWN", "COFFEE"];
 
-  }]);
 
-scrumpokerControllers.controller('CardController', ['$scope', '$routeParams',
-  function($scope, $routeParams) {
-
-    $scope.cardNumber = $routeParams.cardId;
-
-    $scope.includeWithNumber = function(number) {
-
-        $scope.cardNumber = number;
-
+    var tick = function() {
+      $scope.clock = Date.now();
     }
-
+    tick();
+    $interval(tick, 1000);
   }]);
-
-scrumpokerControllers.controller('CardWrapperController', ['$scope', '$routeParams',
-    function($scope, $routeParams) {
-      $scope.cardNumber = $routeParams.cardId;
-    }]);
