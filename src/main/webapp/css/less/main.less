@@ -3,12 +3,36 @@
 body.smartmirror-body {
   background-color:black;
   color: #ffffff;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: lighter;
 }
 .top-empty-space {
   height: 400px;
 }
-.clock {
-    font-size: 128px;
-    font-family: 'Helvetica Neue', sans-serif;
-    font-weight: lighter;
+.clock-widget {
+  position: relative;
+  top: 10px;
+  left: 10px;
+
+  .clock {
+      font-size: 128px;
+  }
+}
+
+.transports-widget {
+    position: relative;
+    top: 950px;
+    left: 10px;
+
+    font-size: 48px;
+
+  table {
+    td.name {
+      text-align:left;
+      min-width:300px;
+    }
+    td.time {
+      text-align:right;
+    }
+  }
 }

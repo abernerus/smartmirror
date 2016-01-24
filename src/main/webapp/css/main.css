@@ -1,12 +1,30 @@
 body.smartmirror-body {
   background-color: black;
   color: #ffffff;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: lighter;
 }
 .top-empty-space {
   height: 400px;
 }
-.clock {
+.clock-widget {
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+.clock-widget .clock {
   font-size: 128px;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-weight: lighter;
+}
+.transports-widget {
+  position: relative;
+  top: 950px;
+  left: 10px;
+  font-size: 48px;
+}
+.transports-widget table td.name {
+  text-align: left;
+  min-width: 300px;
+}
+.transports-widget table td.time {
+  text-align: right;
 }
