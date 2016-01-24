@@ -1,29 +1,32 @@
 <div class="container-fluid">
-	<div class="row clock-widget">
+	<div class="row">
 		<div class="col-md-6">
-			<p class="clock">{{ clock | date:'HH:mm:ss'}}</p>
+			<div class="clock-widget">
+				<p class="clock">{{ clock | date:'HH:mm:ss'}}</p>
+			</div>
 		</div>
 	</div>
 
-	<div class="row transports-widget">
+	<div class="row">
 		<div class="col-md-6">
-			<table>
-				<tr>
-					<td colspan="2">
-						Västtrafik
-						<hr>
-					</td>
-				</tr>
-				<tr ng-repeat="(index, transport) in transports">
-					<td class="name">
-						{{transport.name}}
-					</td>
-					<td class="time">
-						{{transport.timeLeft}} min
-					</td>
-				</tr>
-			</table>
-
+			<div class="transports-widget">
+				<table>
+					<tr>
+						<td colspan="2">
+							Västtrafik
+							<hr>
+						</td>
+					</tr>
+					<tr ng-repeat="(index, transport) in transports">
+						<td class="name">
+							{{transport.name}}
+						</td>
+						<td class="time">
+							{{transport.timeLeft}} min
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
 
