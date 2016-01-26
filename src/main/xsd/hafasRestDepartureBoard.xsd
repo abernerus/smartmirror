@@ -4,10 +4,7 @@
 <!-- - Changed dateformat in comments -->
 <!-- - Removed "S" from leg-types -->
 <!-- =================================== -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-           targetNamespace="http://www.vasttrafik.se/api/departures"
-           xmlns="http://www.vasttrafik.se/api/departures"
->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
     <xs:element name="DepartureBoard">
         <xs:annotation>
             <xs:documentation>The departure board lists up to 20 departures at a specific stop/station or group of stop/stations.

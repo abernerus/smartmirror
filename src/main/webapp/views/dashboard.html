@@ -17,7 +17,7 @@
 							<hr>
 						</td>
 					</tr>
-					<tr ng-repeat="(index, transport) in transports">
+					<tr ng-repeat="(index, transport) in transports" ng-class="{hurry: transport.hurryStatus=='RUN'}">
 						<td class="name">
 							{{transport.name}}
 						</td>

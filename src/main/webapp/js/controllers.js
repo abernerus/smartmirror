@@ -11,6 +11,7 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
     var fetchTransports = function() {
       $http.get("/upcoming").then(function(response) {
         $scope.transports = response.data.transports;
+        console.log($scope.transports);
       });
     }
 
