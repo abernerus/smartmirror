@@ -4,10 +4,6 @@ import com.bernerus.smartmirror.api.VTTransport;
 import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.VTToken;
 import com.bernerus.smartmirror.model.VasttrafikTokenStore;
-import generated.Arrival;
-import generated.ArrivalBoard;
-import generated.LocationList;
-import generated.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -24,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+import se.vasttrafik.api.departures.Departure;
+import se.vasttrafik.api.departures.DepartureBoard;
+import se.vasttrafik.api.location.LocationList;
+import se.vasttrafik.api.location.StopLocation;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -81,24 +81,24 @@ public class VasttrafikRestController {
   @RequestMapping("/upcoming")
   public @ResponseBody VTTransportList getUpcomingTransports() {
 
-    List<Arrival> allArrivals = new ArrayList<>();
-    allArrivals.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
-    allArrivals.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
-    allArrivals.addAll(getTransports(HARLANDA_ID, LINDHOLMEN_ID));
+    List<Departure> allDepartures = new ArrayList<>();
+    allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
+    allDepartures.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
+    allDepartures.addAll(getTransports(HARLANDA_ID, LINDHOLMEN_ID));
 
     //Sort per time
-    Collections.sort(allArrivals, (arrival1, arrival2) -> arrival1.getTime().compareTo(arrival2.getTime()));
+    Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
 
     VTTransportList transportList = new VTTransportList();
-    for(Arrival arrival : allArrivals) {
-      log.info(arrival.getName() + " " + arrival.getTime());
-      transportList.getTransports().add(new VTTransport(arrival.getName(), arrival.getDate(), arrival.getTime()));
+    for(Departure departure : allDepartures) {
+      log.info(departure.getName() + " " + departure.getTime());
+      transportList.getTransports().add(new VTTransport(departure.getName(), departure.getDate(), departure.getTime()));
     }
 
     return transportList;
   }
 
-  private List<Arrival> getTransports(String fromId, String toId) {
+  private List<Departure> getTransports(String fromId, String toId) {
     VTToken token = tokenStore.getToken();
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
@@ -110,7 +110,7 @@ public class VasttrafikRestController {
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
     LocalDateTime currentTime = LocalDateTime.now();
 
-    String url = "https://api.vasttrafik.se/bin/rest.exe/v2/arrivalBoard" +
+    String url = "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard" +
       "?id=" + fromId +
       "&date=" + currentTime.getYear() + "-" + currentTime.getMonthValue() + "-" + currentTime.getDayOfMonth() +
       "&time=" + currentTime.getHour() + ":" + currentTime.getMinute() +
@@ -121,9 +121,9 @@ public class VasttrafikRestController {
       "&direction=" + toId +
       "&format=xml";
     log.info(url);
-    ResponseEntity<ArrivalBoard> response = restTemplate.exchange(url, HttpMethod.GET, request, ArrivalBoard.class);
+    ResponseEntity<DepartureBoard> response = restTemplate.exchange(url, HttpMethod.GET, request, DepartureBoard.class);
     log.info(response.getBody().getServertime());
-    return response.getBody().getArrival();
+    return response.getBody().getDeparture();
   }
 
   private String urlEncode(String s) {

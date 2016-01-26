@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!-- =================================== -->
-<!-- hafasRestArrivalBoard.xsd (Version 1.04) -->
-<!-- ======================================= -->
+<!-- hafasRestDepartureBoard.xsd (Version 1.04) -->
+<!-- - Changed dateformat in comments -->
+<!-- - Removed "S" from leg-types -->
+<!-- =================================== -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-           targetNamespace="http://www.vasttrafik.se/api/arrivals"
-           xmlns="http://www.vasttrafik.se/api/arrivals"
+           targetNamespace="http://www.vasttrafik.se/api/departures"
+           xmlns="http://www.vasttrafik.se/api/departures"
 >
-    <xs:element name="ArrivalBoard">
+    <xs:element name="DepartureBoard">
         <xs:annotation>
-            <xs:documentation>The arrival board lists up to 20 arrivals at a specific stop/station or group of stop/stations.</xs:documentation>
+            <xs:documentation>The departure board lists up to 20 departures at a specific stop/station or group of stop/stations.
+            </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="Arrival"/>
+                <xs:element ref="Departure"/>
             </xs:sequence>
-            <xs:attributeGroup ref="attlist.ArrivalBoard"/>
+            <xs:attributeGroup ref="attlist.DepartureBoard"/>
         </xs:complexType>
     </xs:element>
-    <xs:attributeGroup name="attlist.ArrivalBoard">
+    <xs:attributeGroup name="attlist.DepartureBoard">
         <xs:attribute name="error" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>If some problem occurs while creating the arrival board you can find an error code here. Note: These error codes are not
+                <xs:documentation>If some problem occurs while creating the departure board you can find an error code here. Note: These error codes are not
                     suitable for end users but only for reporting purposes. Most of the errors do not indicate a system failure but data or request parameter
                     issues.
                 </xs:documentation>
@@ -37,33 +40,35 @@
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
-    <xs:element name="Arrival">
+    <xs:element name="Departure">
         <xs:annotation>
-            <xs:documentation>The element Arrival contains all information about a arrival like time, date, stop/station name, track, realtime time, date and
-                track, origin, name and type of the journey. It also contains a reference to journey details.
+            <xs:documentation>The element Departure contains all information about a departure like time, date, stop/station name, track, realtime time, date
+                and track, direction, name and type of the journey. It also contains a reference to journey details.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
+            <xs:sequence minOccurs="0">
                 <xs:element ref="JourneyDetailRef"/>
             </xs:sequence>
-            <xs:attributeGroup ref="attlist.Arrival"/>
+            <xs:attributeGroup ref="attlist.Departure"/>
         </xs:complexType>
     </xs:element>
-    <xs:attributeGroup name="attlist.Arrival">
+    <xs:attributeGroup name="attlist.Departure">
         <xs:attribute name="name" use="required">
             <xs:annotation>
-                <xs:documentation>The attribute name specifies the name of the arriving journey (e.g. "Bus 100").</xs:documentation>
+                <xs:documentation>The attribute name specifies the name of the departing journey (e.g. "Bus 100").
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="sname" use="required">
             <xs:annotation>
-                <xs:documentation>Short name of the leg (e.g. "LERS", "11")</xs:documentation>
+                <xs:documentation>Short name of the leg (e.g. "LERS", "11")
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="type" use="required">
             <xs:annotation>
-                <xs:documentation>The attribute type specifies the type of the arriving journey. Valid values are VAS, LDT (Long Distance Train), REG (Regional
+                <xs:documentation>The attribute type specifies the type of the departing journey. Valid values are VAS, LDT (Long Distance Train), REG (Regional
                     train), BUS , BOAT, TRAM, TAXI (Taxi/Telebus).
                 </xs:documentation>
             </xs:annotation>
@@ -81,7 +86,8 @@
         </xs:attribute>
         <xs:attribute name="stop" type="xs:string" use="required">
             <xs:annotation>
-                <xs:documentation>Contains the name of the stop/station.</xs:documentation>
+                <xs:documentation>Contains the name of the stop/station.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="stopid" type="xs:string" use="required">
@@ -96,37 +102,44 @@
         </xs:attribute>
         <xs:attribute name="time" type="xs:string" use="required">
             <xs:annotation>
-                <xs:documentation>Time in format HH:MM.</xs:documentation>
+                <xs:documentation>Time in format HH:MM.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="date" type="xs:string" use="required">
             <xs:annotation>
-                <xs:documentation>Date in format YYYY-MM-DD.</xs:documentation>
+                <xs:documentation>Date in format YYYY-MM-DD.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="track" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Track information, if available.</xs:documentation>
+                <xs:documentation>Track information, if available.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="rtTime" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Realtime time in format HH:MM if available.</xs:documentation>
+                <xs:documentation>Realtime time in format HH:MM if available.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="rtDate" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Realtime date in format YYYY-MM-DD, if available.</xs:documentation>
+                <xs:documentation>Realtime date in format YYYY-MM-DD, if available.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="rtTrack" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Realtime track information, if available.</xs:documentation>
+                <xs:documentation>Realtime track information, if available.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="origin" type="xs:string" use="optional">
+        <xs:attribute name="direction" type="xs:string" use="optional">
             <xs:annotation>
-                <xs:documentation>Origin of the journey.</xs:documentation>
+                <xs:documentation>Direction information.
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="booking" type="xs:boolean" use="optional" default="true">
@@ -168,7 +181,7 @@
     </xs:attributeGroup>
     <xs:element name="JourneyDetailRef">
         <xs:annotation>
-            <xs:documentation>Reference to journey details.</xs:documentation>
+            <xs:documentation>Reference to journey details of this leg.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:attributeGroup ref="attlist.JourneyDetailRef"/>
