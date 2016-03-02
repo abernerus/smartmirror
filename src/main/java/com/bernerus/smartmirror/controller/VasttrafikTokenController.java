@@ -37,8 +37,6 @@ public final class VasttrafikTokenController {
   }
 
   public static VTToken refresh() {
-    //KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-    //keyStore.load(new FileInputStream(new File("keystore.jks")), "secret".toCharArray());
 
     try {
       SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
@@ -50,8 +48,12 @@ public final class VasttrafikTokenController {
       HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
 
       ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+
+      // Spring Rest!
       RestTemplate restTemplate = new RestTemplate(requestFactory);
 
+      // Set auth headers & Västtrafiks grant_type
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
       headers.add("Authorization", "Basic aGMzTHJ3UW5rWm5rRlFHZlhDTDFkMUlFTmZZYTpmZ0xFUEZsN3FFY2VwZmp3WUlTcHExSlFJZG9h");
@@ -59,11 +61,17 @@ public final class VasttrafikTokenController {
       map.add("grant_type", "client_credentials");
       HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
+      //HTTPS!
       String url = "https://api.vasttrafik.se:443/token";
       ResponseEntity<VTTokenResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, VTTokenResponse.class);
 
+      //Spring has automagically parsed response to VTTokenResponse
       VTTokenResponse vtTokenResponse = response.getBody();
+
+
       long expires = System.currentTimeMillis() + (Long.parseLong(vtTokenResponse.getExpires_in()) * 1000);
+
+      //Map it to  a more useful object
       VTToken token = new VTToken(expires, vtTokenResponse.getAccess_token());
       log.info("New token received with key: " + token.getAccessKey());
       return token;

@@ -47,8 +47,6 @@ public class VasttrafikRestController {
 
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
-
-
   @RequestMapping("/killtoken")
   public @ResponseBody String killToken() {
     tokenStore.killToken();
