@@ -4,10 +4,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import static com.bernerus.smartmirror.controller.VasttrafikRestController.ATTEHOGSGATAN_ID;
-import static com.bernerus.smartmirror.controller.VasttrafikRestController.HARLANDA_ID;
-import static com.bernerus.smartmirror.controller.VasttrafikRestController.MUNKEBACKSMOTET_ID;
-
 /**
  * Created by andreas on 24/01/16.
  */

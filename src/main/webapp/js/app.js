@@ -1,6 +1,7 @@
 var smartMirrorApp = angular.module('smartMirrorApp', [
   'ngRoute',
-  'smartMirrorControllers'
+  'smartMirrorControllers',
+  'smartMirrorServices'
 ]);
 
 smartMirrorApp.config(['$routeProvider',

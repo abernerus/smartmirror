@@ -1,13 +1,12 @@
 var smartMirrorControllers = angular.module('smartMirrorControllers', []);
 
-smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$http',
-  function ($scope, $interval, $http) {
-    $scope.test = 'hello';
-
+smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$http', 'VtService',
+  function ($scope, $interval, $http, VtService) {
     var tick = function() {
       $scope.clock = Date.now();
     }
 
+    //Oldschool REST Call :)
     var fetchTransports = function() {
       $http.get("/upcoming").then(function(response) {
         $scope.transports = response.data.transports;
@@ -15,10 +14,10 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
       });
     }
 
+    $scope.$on('transportsMessage', function(event, broadcastMessage) {
+        $scope.transports = broadcastMessage.transports;
+    })
 
     tick();
-    fetchTransports();
     $interval(tick, 1000);
-    $interval(fetchTransports, 1000 * 60);
-
   }]);

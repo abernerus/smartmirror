@@ -18,9 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import se.vasttrafik.api.location.LocationList;
 import se.vasttrafik.api.location.StopLocation;
@@ -30,16 +27,15 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by andreas on 25/12/15.
+ * Created by andreas on 03/03/16.
  */
 @Controller
-public class VasttrafikRestController {
-  private static final Logger log = LoggerFactory.getLogger(VasttrafikRestController.class);
+public class VasttrafikController {
+  private static final Logger log = LoggerFactory.getLogger(VasttrafikController.class);
   public static final String MUNKEBACKSMOTET_ID = "9021014004840000";
   public static final String ATTEHOGSGATAN_ID = "9021014007750000";
   public static final String HARLANDA_ID = "9021014003310000";
@@ -47,14 +43,13 @@ public class VasttrafikRestController {
 
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
-  @RequestMapping("/killtoken")
-  public @ResponseBody String killToken() {
+  public String killToken() {
     tokenStore.killToken();
     return "token destroyed";
   }
 
-  @RequestMapping("/getid/{destinationName}")
-  public @ResponseBody String getId(@PathVariable String destinationName, Model model) {
+  public String getId(@PathVariable
+                                    String destinationName, Model model) {
     VTToken token = tokenStore.getToken();
 
     RestTemplate restTemplate = new RestTemplate();
@@ -76,8 +71,7 @@ public class VasttrafikRestController {
     return "greeting";
   }
 
-  @RequestMapping("/upcoming")
-  public @ResponseBody VTTransportList getUpcomingTransports() {
+  public VTTransportList getUpcomingTransports() {
 
     List<Departure> allDepartures = new ArrayList<>();
     allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
