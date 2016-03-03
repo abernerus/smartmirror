@@ -16,8 +16,8 @@ body.smartmirror-body {
   font-size: 128px;
 }
 .transports-widget {
-  position: relative;
-  top: 950px;
+  position: fixed;
+  bottom: 0px;
   left: 10px;
   font-size: 40px;
 }

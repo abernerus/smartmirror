@@ -8,7 +8,17 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
     // Create a unique callback ID to map requests to responses
     var currentCallbackId = 0;
     // Create our websocket object with the address to the websocket
-    var ws = new WebSocket("ws://localhost:18080/transportsHandler");
+
+    var loc = window.location, new_uri;
+    if (loc.protocol === "https:") {
+        new_uri = "wss:";
+    } else {
+        new_uri = "ws:";
+    }
+    new_uri += "//" + loc.host;
+    new_uri += loc.pathname + "/transportsHandler";
+
+    var ws = new WebSocket(new_uri);
 
     ws.onopen = function(){
         console.log("Socket has been opened!");
