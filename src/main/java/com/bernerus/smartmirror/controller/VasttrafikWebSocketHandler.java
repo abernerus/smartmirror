@@ -43,8 +43,7 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
   }
 
   @Override
-  public void handleTransportError(WebSocketSession session, Throwable exception)
-    throws Exception {
+  public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
     executor.shutdown();
     session.close(CloseStatus.SERVER_ERROR);
   }

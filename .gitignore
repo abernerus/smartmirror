@@ -23,3 +23,5 @@ hs_err_pid*
 src/main/webapp/components
 src/main/webapp/node
 src/main/webapp/node_modules
+
+myapplication.log
