@@ -83,14 +83,18 @@ public class VasttrafikController {
 
     VTTransportList transportList = new VTTransportList();
     for(Departure departure : allDepartures) {
-      log.info(departure.getName() + " " + departure.getTime());
-      VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), departure.getTime(), departure.getStop());
+      log.info(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
+      VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
       if(transport.getTimeLeft() > 0) {
         transportList.getTransports().add(transport);
       }
     }
 
     return transportList;
+  }
+
+  private String getTheTime(Departure departure) {
+    return departure.getRtTime() != null ? departure.getRtTime() : departure.getTime();
   }
 
   private List<Departure> filterBusToLindholmen(List<Departure> departures) {

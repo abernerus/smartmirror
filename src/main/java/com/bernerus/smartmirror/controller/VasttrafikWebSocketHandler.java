@@ -44,11 +44,19 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
 
   @Override
   public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-    executor.shutdown();
     session.close(CloseStatus.SERVER_ERROR);
+    this.session.close(CloseStatus.SERVER_ERROR);
+    throw new RuntimeException(exception);
   }
 
-  private void subscribeForDepartures() throws IOException {
+  @Override
+  public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    super.afterConnectionClosed(session, status);
+    executor.shutdown();
+    log.warn("Session closed");
+  }
+
+  private void subscribeForDepartures() {
     sendTextMessage("messageSocket opened! Transport subscription set up.");
     executor = Executors.newScheduledThreadPool(1);
     Runnable pollTask = () -> {

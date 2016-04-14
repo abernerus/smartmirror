@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -16,6 +17,7 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 
 @SpringBootApplication
 @EnableWebSocket
+@ComponentScan
 public class Application extends SpringBootServletInitializer implements WebSocketConfigurer {
   private static final Logger log = LoggerFactory.getLogger(Application.class);
 

@@ -11,6 +11,10 @@ smartMirrorApp.config(['$routeProvider',
         templateUrl: 'views/dashboard.html',
         controller: 'DashController'
       })
+      .when('/smartdash/:reloads', {
+        templateUrl: 'views/dashboard.html',
+        controller: 'DashController'
+      })
       .otherwise({
         redirectTo: '/smartdash'
       });
