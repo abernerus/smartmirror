@@ -9,6 +9,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -24,6 +27,18 @@ public class Application extends SpringBootServletInitializer implements WebSock
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry.addHandler(myHandler(), "/transportsHandler");
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate(clientHttpRequestFactory());
+  }
+
+  private ClientHttpRequestFactory clientHttpRequestFactory() {
+    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+    factory.setReadTimeout(15000);
+    factory.setConnectTimeout(15000);
+    return factory;
   }
 
 //  @Override
