@@ -83,7 +83,7 @@ public class VasttrafikController {
 
     VTTransportList transportList = new VTTransportList();
     for(Departure departure : allDepartures) {
-      log.info(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
+      log.debug(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
       VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
       if(transport.getTimeLeft() > 0) {
         transportList.getTransports().add(transport);
@@ -129,9 +129,11 @@ public class VasttrafikController {
       "&timeSpan=30" +
       "&direction=" + toId +
       "&format=xml";
-    log.info(url);
+    log.info("REQUESTING VASTTRAFIK");
+    log.debug(url);
     ResponseEntity<DepartureBoard> response = restTemplate.exchange(url, HttpMethod.GET, request, DepartureBoard.class);
-    log.info(response.getBody().getServertime());
+    log.debug(response.getBody().getServertime());
+    log.info("VASTTRAFIK RESPONSE RECEIVED");
     return response.getBody().getDeparture();
   }
 
