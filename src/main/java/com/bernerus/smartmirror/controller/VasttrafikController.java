@@ -44,6 +44,8 @@ public class VasttrafikController {
 
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
+  private boolean screenSleeps = false;
+
   @Autowired
   RestTemplate restTemplate;
 
@@ -75,24 +77,24 @@ public class VasttrafikController {
   }
 
   public VTTransportList getUpcomingTransports() {
-
-    List<Departure> allDepartures = new ArrayList<>();
-    allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
-    allDepartures.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
-    allDepartures.addAll(filterBusToLindholmen(getTransports(HARLANDA_ID, SVINGELN_ID)));
-
-    //Sort per time
-    Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
-
     VTTransportList transportList = new VTTransportList();
-    for(Departure departure : allDepartures) {
-      log.debug(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
-      VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
-      if(transport.getTimeLeft() > 0) {
-        transportList.getTransports().add(transport);
+    if(!screenSleeps) {
+      List<Departure> allDepartures = new ArrayList<>();
+      allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
+      allDepartures.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
+      allDepartures.addAll(filterBusToLindholmen(getTransports(HARLANDA_ID, SVINGELN_ID)));
+
+      //Sort per time
+      Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
+
+      for (Departure departure : allDepartures) {
+        log.debug(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
+        VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
+        if (transport.getTimeLeft() > 0) {
+          transportList.getTransports().add(transport);
+        }
       }
     }
-
     return transportList;
   }
 
@@ -147,4 +149,7 @@ public class VasttrafikController {
     }
   }
 
+  public void setScreenSleeps(boolean screenSleeps) {
+    this.screenSleeps = screenSleeps;
+  }
 }

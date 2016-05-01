@@ -48,7 +48,7 @@ public class Application extends SpringBootServletInitializer implements WebSock
 //  }
 
   @Bean
-  public WebSocketHandler myHandler() {
+  public VasttrafikWebSocketHandler myHandler() {
     return new VasttrafikWebSocketHandler();
   }
 

@@ -32,9 +32,14 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
 
       ws.onmessage = function(jsonMessage) {
         message = JSON.parse(jsonMessage.data);
+        console.log(message);
         if(typeof(message.transports) !== "undefined" ) {
           $rootScope.$broadcast('transportsMessage', {
             transports: message.transports
+          });
+        } else if(typeof(message.temperature) !== "undefined") {
+          $rootScope.$broadcast('temperatureMessage', {
+            temperature: message.temperature
           });
         }
       };

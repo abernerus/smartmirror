@@ -2,9 +2,11 @@ package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
+import com.bernerus.smartmirror.dto.Temperature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -56,6 +58,15 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
     log.warn("Session closed");
   }
 
+  public void requestTransportsNow() {
+    try {
+      VTTransportList upcomingTransports = vasttrafikController.getUpcomingTransports();
+      session.sendMessage(new TextMessage(mapper.writeValueAsString(upcomingTransports)));
+    } catch (IOException e) {
+      log.error(e.getMessage());
+    }
+  }
+
   private void subscribeForDepartures() {
     sendTextMessage("messageSocket opened! Transport subscription set up.");
     executor = Executors.newScheduledThreadPool(1);
@@ -81,5 +92,9 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
       log.error(e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  public void sendTemperatureToConsumers(float temperature) {
+    sendMessage(new Temperature(temperature));
   }
 }
