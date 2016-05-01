@@ -8,6 +8,7 @@ import generated.Departure;
 import generated.DepartureBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -43,6 +44,9 @@ public class VasttrafikController {
 
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
+  @Autowired
+  RestTemplate restTemplate;
+
   public String killToken() {
     tokenStore.killToken();
     return "token destroyed";
@@ -52,7 +56,6 @@ public class VasttrafikController {
                                     String destinationName, Model model) {
     VTToken token = tokenStore.getToken();
 
-    RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
     headers.add("Authorization", "Bearer " + token.getAccessKey());
@@ -109,7 +112,6 @@ public class VasttrafikController {
 
   private List<Departure> getTransports(String fromId, String toId) {
     VTToken token = tokenStore.getToken();
-    RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
     headers.add("Authorization", "Bearer " + token.getAccessKey());
