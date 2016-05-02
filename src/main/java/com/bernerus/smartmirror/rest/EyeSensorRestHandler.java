@@ -2,6 +2,7 @@ package com.bernerus.smartmirror.rest;
 
 import com.bernerus.smartmirror.controller.VasttrafikController;
 import com.bernerus.smartmirror.controller.VasttrafikWebSocketHandler;
+import com.bernerus.smartmirror.model.ApplicationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,13 @@ public class EyeSensorRestHandler {
   ScheduledFuture<?> future;
 
   @Autowired
-  VasttrafikController vasttrafikController;
-
-  @Autowired
   VasttrafikWebSocketHandler vasttrafikWebSocketHandler;
 
   @Autowired
   RestTemplate restTemplate;
+
+  @Autowired
+  ApplicationState applicationState;
 
   @RequestMapping("/reportmovement")
   public @ResponseBody String reportMovement() {
@@ -67,10 +68,14 @@ public class EyeSensorRestHandler {
   }
 
   private String callMirror(final String onOrOff) {
+    if(!applicationState.isScreenSleeps() && "on".equals(onOrOff)) {
+      return "Ignored";
+    }
+
     if("off".equals(onOrOff)) {
-      vasttrafikController.setScreenSleeps(true);
+      applicationState.setScreenSleeps(true);
     } else {
-      vasttrafikController.setScreenSleeps(false);
+      applicationState.setScreenSleeps(false);
       vasttrafikWebSocketHandler.requestTransportsNow();
     }
 

@@ -3,6 +3,7 @@ package com.bernerus.smartmirror.controller;
 import com.bernerus.smartmirror.api.VTTransport;
 import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.VTToken;
+import com.bernerus.smartmirror.model.ApplicationState;
 import com.bernerus.smartmirror.model.VasttrafikTokenStore;
 import generated.Departure;
 import generated.DepartureBoard;
@@ -44,10 +45,11 @@ public class VasttrafikController {
 
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
-  private boolean screenSleeps = false;
-
   @Autowired
   RestTemplate restTemplate;
+
+  @Autowired
+  ApplicationState applicationState;
 
   public String killToken() {
     tokenStore.killToken();
@@ -78,7 +80,7 @@ public class VasttrafikController {
 
   public VTTransportList getUpcomingTransports() {
     VTTransportList transportList = new VTTransportList();
-    if(!screenSleeps) {
+    if(!applicationState.isScreenSleeps()) {
       List<Departure> allDepartures = new ArrayList<>();
       allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
       allDepartures.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
@@ -147,9 +149,5 @@ public class VasttrafikController {
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public void setScreenSleeps(boolean screenSleeps) {
-    this.screenSleeps = screenSleeps;
   }
 }
