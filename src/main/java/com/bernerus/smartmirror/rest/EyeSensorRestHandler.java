@@ -68,9 +68,10 @@ public class EyeSensorRestHandler {
   }
 
   private String callMirror(final String onOrOff) {
-    if(!applicationState.isScreenSleeps() && "on".equals(onOrOff)) {
-      return "Ignored";
-    }
+    //Doesn't seem to work, dont get it....
+//    if(applicationState.isScreenSleeps() == false && "on".equals(onOrOff)) {
+//      return "Ignored";
+//    }
 
     if("off".equals(onOrOff)) {
       applicationState.setScreenSleeps(true);
