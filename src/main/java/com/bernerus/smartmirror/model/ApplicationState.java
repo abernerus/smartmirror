@@ -1,7 +1,5 @@
 package com.bernerus.smartmirror.model;
 
-import com.bernerus.smartmirror.controller.VasttrafikTokenController;
-import com.bernerus.smartmirror.dto.VTToken;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,9 +7,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApplicationState {
-  private boolean screenSleeps = false;
+  private boolean screenSleeps = true;
 
-  public boolean isScreenSleeps() {
+  public boolean screenSleeps() {
     return screenSleeps;
   }
 

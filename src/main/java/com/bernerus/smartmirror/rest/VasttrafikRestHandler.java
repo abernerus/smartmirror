@@ -23,12 +23,6 @@ public class VasttrafikRestHandler {
     return vasttrafikController.killToken();
   }
 
-  @RequestMapping("/getid/{destinationName}")
-  public @ResponseBody
-  String getId(@PathVariable String destinationName, Model model) {
-    return vasttrafikController.getId(destinationName, model);
-  }
-
   @RequestMapping("/upcoming")
   public @ResponseBody VTTransportList getUpcomingTransports() {
     return vasttrafikController.getUpcomingTransports();

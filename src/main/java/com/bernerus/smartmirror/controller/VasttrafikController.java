@@ -15,14 +15,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import se.vasttrafik.api.location.LocationList;
-import se.vasttrafik.api.location.StopLocation;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -31,18 +30,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created by andreas on 03/03/16.
  */
-@Controller
+@Service
 public class VasttrafikController {
-  private static final Logger log = LoggerFactory.getLogger(VasttrafikController.class);
   public static final String MUNKEBACKSMOTET_ID = "9021014004840000";
   public static final String ATTEHOGSGATAN_ID = "9021014007750000";
   public static final String HARLANDA_ID = "9021014003310000";
   public static final String SVINGELN_ID = "9021014006480000";
-
+  private static final Logger log = LoggerFactory.getLogger(VasttrafikController.class);
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
   @Autowired
@@ -56,45 +56,34 @@ public class VasttrafikController {
     return "token destroyed";
   }
 
-  public String getId(@PathVariable
-                                    String destinationName, Model model) {
-    VTToken token = tokenStore.getToken();
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
-    headers.add("Authorization", "Bearer " + token.getAccessKey());
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
-    String destination = urlEncode(destinationName);
-
-    String url = "https://api.vasttrafik.se/bin/rest.exe/v2/location.name?format=xml&input=" + destination;
-    log.info(url);
-    ResponseEntity<LocationList> response = restTemplate.exchange(url, HttpMethod.GET, request, LocationList.class);
-
-    log.info(response.toString());
-
-    StopLocation location = (StopLocation) response.getBody().getStopLocationOrCoordLocation().get(0);
-
-    model.addAttribute("name", location.getId());
-    return "greeting";
-  }
-
   public VTTransportList getUpcomingTransports() {
     VTTransportList transportList = new VTTransportList();
-    if(!applicationState.isScreenSleeps()) {
+    if (!applicationState.screenSleeps()) {
       List<Departure> allDepartures = new ArrayList<>();
-      allDepartures.addAll(getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID));
-      allDepartures.addAll(getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID));
-      allDepartures.addAll(filterBusToLindholmen(getTransports(HARLANDA_ID, SVINGELN_ID)));
+      log.info("REQUESTING VASTTRAFIK");
+      Future<List<Departure>> list1 = getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID);
+      Future<List<Departure>> list2 = getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID);
+      Future<List<Departure>> list3 = getTransports(HARLANDA_ID, SVINGELN_ID);
 
-      //Sort per time
-      Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
+      try {
+        log.debug("GETTING RESPONSES FROM VT...");
+        allDepartures.addAll(list1.get());
+        allDepartures.addAll(list2.get());
+        allDepartures.addAll(filterBusToLindholmen(list3.get()));
+        log.info("VASTTRAFIK RESPONSES RECEIVED");
 
-      for (Departure departure : allDepartures) {
-        log.debug(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
-        VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
-        if (transport.getTimeLeft() > 0) {
-          transportList.getTransports().add(transport);
+        //Sort per time
+        Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
+
+        for (Departure departure : allDepartures) {
+          log.debug(departure.getName() + " " + departure.getTime() + " RealTime: " + departure.getRtTime());
+          VTTransport transport = new VTTransport(departure.getName(), departure.getDate(), getTheTime(departure), departure.getStop());
+          if (transport.getTimeLeft() > 0) {
+            transportList.getTransports().add(transport);
+          }
         }
+      } catch (InterruptedException | ExecutionException e) {
+        log.error("Failed to query Vasttrafik!");
       }
     }
     return transportList;
@@ -106,15 +95,16 @@ public class VasttrafikController {
 
   private List<Departure> filterBusToLindholmen(List<Departure> departures) {
     ArrayList<Departure> filteredList = new ArrayList<>();
-    for(Departure departure : departures) {
-      if(departure.getDirection().startsWith("Lindholmen")) {
+    for (Departure departure : departures) {
+      if (departure.getDirection().startsWith("Lindholmen")) {
         filteredList.add(departure);
       }
     }
     return filteredList;
   }
 
-  private List<Departure> getTransports(String fromId, String toId) {
+  @Async
+  private Future<List<Departure>> getTransports(String fromId, String toId) {
     VTToken token = tokenStore.getToken();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
@@ -135,12 +125,15 @@ public class VasttrafikController {
       "&timeSpan=30" +
       "&direction=" + toId +
       "&format=xml";
-    log.info("REQUESTING VASTTRAFIK");
-    log.debug(url);
-    ResponseEntity<DepartureBoard> response = restTemplate.exchange(url, HttpMethod.GET, request, DepartureBoard.class);
-    log.debug(response.getBody().getServertime());
-    log.info("VASTTRAFIK RESPONSE RECEIVED");
-    return response.getBody().getDeparture();
+    log.debug(String.format("VT URL:%s", url));
+    try {
+      ResponseEntity<DepartureBoard> responseEntity = restTemplate.exchange(url, HttpMethod.GET, request, DepartureBoard.class);
+      log.debug(responseEntity.getBody().getServertime());
+      return new AsyncResult<>(responseEntity.getBody().getDeparture());
+    } catch (RestClientException e) {
+      log.error("Exception from vasttrafik! Returning empty list...", e);
+      return new AsyncResult<>(new ArrayList<>());
+    }
   }
 
   private String urlEncode(String s) {
