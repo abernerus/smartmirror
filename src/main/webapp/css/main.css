@@ -34,3 +34,6 @@ body.smartmirror-body {
 .transports-widget table td.time {
   text-align: right;
 }
+.messages-widget {
+  font-size: 40px;
+}

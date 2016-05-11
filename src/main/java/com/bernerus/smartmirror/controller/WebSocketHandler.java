@@ -1,6 +1,7 @@
 package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
+import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by andreas on 03/03/16.
  */
-public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
-  private static org.slf4j.Logger log = LoggerFactory.getLogger(VasttrafikWebSocketHandler.class);
+public class WebSocketHandler extends TextWebSocketHandler {
+  private static org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
   ObjectMapper mapper = new ObjectMapper();
   ScheduledExecutorService executor;
   @Autowired
@@ -33,12 +33,14 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
 
   VTTransportList previouslyFetchedUpcomingTransports = null;
   LocalDateTime previouslyFetchedUpcomingTransportsTime = LocalDateTime.MIN;
+  private String mirrorMessage = "";
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
     log.info("Opened new session in instance " + this);
     this.sessions.put(session.getId(), session);
     this.subscribeForDepartures();
+    this.sendMessage(new MirrorMessage(this.mirrorMessage));
   }
 
   @Override
@@ -109,5 +111,10 @@ public class VasttrafikWebSocketHandler extends TextWebSocketHandler {
 
   public void sendTemperatureToConsumers(float temperature) {
     sendMessage(new Temperature(temperature));
+  }
+
+  public void sendMessageToConsumers(String message) {
+    this.mirrorMessage = message;
+    sendMessage(new MirrorMessage(message));
   }
 }

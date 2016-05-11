@@ -41,7 +41,9 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
           $rootScope.$broadcast('temperatureMessage', {
             temperature: message.temperature
           });
-        }
+        } else if(typeof(message.mirrorMessage) !== "undefined") {
+           $rootScope.$broadcast('mirrorMessage', message.mirrorMessage);
+         }
       };
 
       ws.onclose = function(event) {

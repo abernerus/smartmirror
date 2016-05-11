@@ -27,6 +27,10 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
         $scope.temperature = broadcastMessage.temperature;
     });
 
+    $scope.$on('mirrorMessage', function(event, broadcastMessage) {
+      $scope.mirrorMessage = broadcastMessage;
+    });
+
     $scope.$on('socketClose', function(event, wsEvent) {
         setTimeout(function() {
           $scope.reloads = $scope.reloads + 1;

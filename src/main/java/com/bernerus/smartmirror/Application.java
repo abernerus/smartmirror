@@ -1,6 +1,6 @@
 package com.bernerus.smartmirror;
 
-import com.bernerus.smartmirror.controller.VasttrafikWebSocketHandler;
+import com.bernerus.smartmirror.controller.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -43,13 +42,13 @@ public class Application extends SpringBootServletInitializer implements WebSock
 
 //  @Override
 //  public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-//    registry.addHandler(new VasttrafikWebSocketHandler(), "/transportsHandler")
+//    registry.addHandler(new WebSocketHandler(), "/transportsHandler")
 //      .addInterceptors(new HttpSessionHandshakeInterceptor());
 //  }
 
   @Bean
-  public VasttrafikWebSocketHandler myHandler() {
-    return new VasttrafikWebSocketHandler();
+  public WebSocketHandler myHandler() {
+    return new WebSocketHandler();
   }
 
   @Bean

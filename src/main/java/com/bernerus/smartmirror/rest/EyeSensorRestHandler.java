@@ -1,6 +1,6 @@
 package com.bernerus.smartmirror.rest;
 
-import com.bernerus.smartmirror.controller.VasttrafikWebSocketHandler;
+import com.bernerus.smartmirror.controller.WebSocketHandler;
 import com.bernerus.smartmirror.model.ApplicationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class EyeSensorRestHandler {
   ScheduledFuture<?> future;
 
   @Autowired
-  VasttrafikWebSocketHandler vasttrafikWebSocketHandler;
+  WebSocketHandler webSocketHandler;
 
   @Autowired
   RestTemplate restTemplate;
@@ -104,7 +104,7 @@ public class EyeSensorRestHandler {
       applicationState.setScreenSleeps(true);
     } else {
       applicationState.setScreenSleeps(false);
-      vasttrafikWebSocketHandler.requestTransportsNow();
+      webSocketHandler.requestTransportsNow();
     }
 
     String url = "http://192.168.0.18:5000/" + onOrOff;

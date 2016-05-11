@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  */
 @Controller
-public class TemperatureRestHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(TemperatureRestHandler.class);
+public class MessageRestHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(MessageRestHandler.class);
+
 
   @Autowired
   WebSocketHandler webSocketHandler;
 
-  @RequestMapping("/reporttemperature/{temperature}")
-  public @ResponseBody String reportTemperature(@PathVariable String temperature) {
-    LOG.info("Received new temperature! (" + temperature + "°C)");
-    webSocketHandler.sendTemperatureToConsumers(Float.parseFloat(temperature));
-    return "OK";
+  @RequestMapping("/message/set/{message}")
+  public @ResponseBody String setMessage(@PathVariable String message) {
+    LOG.info("Received new message: " + message);
+    webSocketHandler.sendMessageToConsumers(message);
+    return "Message Set";
   }
 
 }
