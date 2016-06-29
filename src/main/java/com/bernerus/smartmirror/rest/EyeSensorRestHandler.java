@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -94,7 +95,6 @@ public class EyeSensorRestHandler {
   }
 
   private String callMirror(final String onOrOff, final boolean force) {
-    //Doesn't seem to work, dont get it....
     if(!applicationState.screenSleeps() && "on".equals(onOrOff) && !force) {
       LOG.info("Detected movement but screen is already on. Ignoring...");
       return "Ignored";
@@ -104,7 +104,7 @@ public class EyeSensorRestHandler {
       applicationState.setScreenSleeps(true);
     } else {
       applicationState.setScreenSleeps(false);
-      webSocketHandler.requestTransportsNow();
+      CompletableFuture.runAsync(() -> webSocketHandler.requestTransportsNow());
     }
 
     String url = "http://192.168.0.18:5000/" + onOrOff;
