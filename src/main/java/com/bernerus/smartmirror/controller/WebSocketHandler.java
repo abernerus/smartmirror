@@ -4,6 +4,7 @@ import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
+import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,24 @@ import java.util.concurrent.TimeUnit;
 public class WebSocketHandler extends TextWebSocketHandler {
   private static org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
   ObjectMapper mapper = new ObjectMapper();
-  ScheduledExecutorService executor;
+
+  ScheduledExecutorService vasttrafikExecutor;
+  ScheduledExecutorService weatherExecutor;
+
   @Autowired
   VasttrafikController vasttrafikController;
+
+  @Autowired
+  WeatherController weatherController;
+
   private Map<String, WebSocketSession> sessions = new HashMap<>();
 
   VTTransportList previouslyFetchedUpcomingTransports = null;
   LocalDateTime previouslyFetchedUpcomingTransportsTime = LocalDateTime.MIN;
+
+  YrWeather previouslyFetchedWeather = null;
+  LocalDateTime previouslyFetchedWeatherTime = LocalDateTime.MIN;
+
   private String mirrorMessage = "";
 
   @Override
@@ -40,6 +52,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     log.info("Opened new session in instance " + this);
     this.sessions.put(session.getId(), session);
     this.subscribeForDepartures();
+    this.subscribeForWeather();
     this.sendMessage(new MirrorMessage(this.mirrorMessage));
   }
 
@@ -63,9 +76,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     this.sessions.remove(sessionId);
     log.warn("Session with id " + sessionId + " was closed!");
 
-    if (sessions.size() == 0 && executor != null) {
-      log.warn("All sessions closed. Killing executor");
-      executor.shutdown();
+    if (sessions.size() == 0 && vasttrafikExecutor != null) {
+      log.warn("All sessions closed. Killing vasttrafikExecutor");
+      vasttrafikExecutor.shutdown();
     }
   }
 
@@ -85,14 +98,36 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private void subscribeForDepartures() {
     sendTextMessage("messageSocket opened! Transport subscription set up.");
-    if (executor == null || (executor.isShutdown() || executor.isTerminated())) {
-      log.info("Creating new executor with vasttrafik poll task!");
-      executor = Executors.newScheduledThreadPool(1);
-      executor.scheduleAtFixedRate(this::requestTransportsNow, 0, 1, TimeUnit.MINUTES);
+    if (vasttrafikExecutor == null || (vasttrafikExecutor.isShutdown() || vasttrafikExecutor.isTerminated())) {
+      log.info("Creating new vasttrafikExecutor with vasttrafik poll task!");
+      vasttrafikExecutor = Executors.newScheduledThreadPool(1);
+      vasttrafikExecutor.scheduleAtFixedRate(this::requestTransportsNow, 0, 1, TimeUnit.MINUTES);
     } else {
       log.info("Executor already running...");
       requestTransportsNow();
     }
+  }
+
+  private void subscribeForWeather() {
+    sendTextMessage("messageSocket opened! Weather subscription set up.");
+    if (weatherExecutor == null || (weatherExecutor.isShutdown() || weatherExecutor.isTerminated())) {
+      log.info("Creating new weatherExecutor with yr.no poll task!");
+      weatherExecutor = Executors.newScheduledThreadPool(1);
+      weatherExecutor.scheduleAtFixedRate(this::requestWeatherNow, 0, 1, TimeUnit.HOURS);
+    } else {
+      log.info("weatherExecutor already running...");
+      requestWeatherNow();
+    }
+  }
+
+  public void requestWeatherNow() {
+    if(previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
+      previouslyFetchedWeatherTime = LocalDateTime.now();
+      previouslyFetchedWeather = weatherController.getWeather();
+    } else {
+      log.info("Recently fetched weather data. Returning it instead of fetching again.");
+    }
+    sendMessage(previouslyFetchedWeather);
   }
 
   private void sendTextMessage(final String message) {

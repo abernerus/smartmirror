@@ -43,6 +43,8 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
           });
         } else if(typeof(message.mirrorMessage) !== "undefined") {
            $rootScope.$broadcast('mirrorMessage', message.mirrorMessage);
+        } else if(typeof(message.weatherDatas) !== "undefined") {
+            $rootScope.$broadcast('weatherMessage', message.weatherDatas);
          }
       };
 

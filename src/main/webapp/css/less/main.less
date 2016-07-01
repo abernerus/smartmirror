@@ -47,3 +47,39 @@ body.smartmirror-body {
 .messages-widget {
   font-size: 40px;
 }
+
+.weather-widget {
+  .weather-from-time {
+    font-size:1.25em;
+    margin-left: -20px;
+    &.not-first {
+      margin-left: -54px;
+    }
+  }
+  .weather-to-time {
+    font-size:1.25em;
+    text-align: right;
+    margin-top: -26px;
+  }
+  .weather-wrapper {
+    &.not-last {
+       border-right: 1px solid #fff;
+    }
+    .weather-icon {
+      width: 150px;
+      float:left;
+    }
+    .weather-data {
+      float:left;
+      .weather-temperature {
+        font-size:4em;
+        text-align:left;
+      }
+      .weather-precipitation {
+         font-size:1.5em;
+         padding-left: 10px;
+      }
+    }
+
+  }
+}

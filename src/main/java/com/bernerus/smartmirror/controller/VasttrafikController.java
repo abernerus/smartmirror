@@ -42,6 +42,7 @@ public class VasttrafikController {
   public static final String ATTEHOGSGATAN_ID = "9021014007750000";
   public static final String HARLANDA_ID = "9021014003310000";
   public static final String SVINGELN_ID = "9021014006480000";
+  public static final String MINUTES = "20";
   private static final Logger log = LoggerFactory.getLogger(VasttrafikController.class);
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
@@ -122,7 +123,7 @@ public class VasttrafikController {
       "&useVas=0" +
       "&useLDTrain=0" +
       "&useRegTrain=0" +
-      "&timeSpan=30" +
+      "&timeSpan=" + MINUTES +
       "&direction=" + toId +
       "&format=xml";
     log.debug(String.format("VT URL:%s", url));
