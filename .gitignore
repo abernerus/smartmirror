@@ -24,4 +24,4 @@ src/main/webapp/components
 src/main/webapp/node
 src/main/webapp/node_modules
 
-myapplication.log
+smartmirror.log

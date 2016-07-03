@@ -76,9 +76,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
     this.sessions.remove(sessionId);
     log.warn("Session with id " + sessionId + " was closed!");
 
-    if (sessions.size() == 0 && vasttrafikExecutor != null) {
-      log.warn("All sessions closed. Killing vasttrafikExecutor");
-      vasttrafikExecutor.shutdown();
+    if (sessions.size() == 0) {
+      log.warn("All sessions closed.");
+      if(vasttrafikExecutor != null) {
+        log.info("Killing vasttrafikExecutor");
+        vasttrafikExecutor.shutdown();
+      }
+      if(weatherExecutor != null) {
+        log.info("Killing weatherExecutor");
+        weatherExecutor.shutdown();
+      }
     }
   }
 

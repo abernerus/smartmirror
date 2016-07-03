@@ -3,24 +3,16 @@ package com.bernerus.smartmirror.controller;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.bernerus.smartmirror.model.ApplicationState;
 import com.bernerus.smartmirror.util.YrXmlParser;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collections;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Created by andreas on 03/03/16.
@@ -37,20 +29,12 @@ public class WeatherController {
 
 
   public YrWeather getWeather() {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
-    headers.add("Cache-Control", "no-cache");
-    headers.add("Pragma", "no-cache");
-    headers.add("Connection", "keep-alive");
-    headers.add("Content-Type", "text/plain");
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
-
-    //Temporarly disabled
     String result = restTemplate.getForObject("http://www.yr.no/place/Sweden/Västra_Götaland/Gothenburg/forecast.xml", String.class);
     //String result = getWeatherFromFile();
 
-//    ResponseEntity<String> responseEntity = restTemplate.exchange("http://www.yr.no/place/Sweden/Västra_Götaland/Gothenburg/forecast.xml", HttpMethod.GET, request, String.class);
+    log.info("Requesting YrWeather");
     YrWeather weather = YrXmlParser.readYrXml(result);
+    log.info("Received weather times: " + weather.getWeatherDatas().size());
     return weather;
   }
 

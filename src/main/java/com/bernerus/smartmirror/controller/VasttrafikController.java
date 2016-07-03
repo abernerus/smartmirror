@@ -61,7 +61,7 @@ public class VasttrafikController {
     VTTransportList transportList = new VTTransportList();
     if (!applicationState.screenSleeps()) {
       List<Departure> allDepartures = new ArrayList<>();
-      log.info("REQUESTING VASTTRAFIK");
+      log.debug("REQUESTING VASTTRAFIK");
       Future<List<Departure>> list1 = getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID);
       Future<List<Departure>> list2 = getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID);
       Future<List<Departure>> list3 = getTransports(HARLANDA_ID, SVINGELN_ID);
@@ -71,7 +71,7 @@ public class VasttrafikController {
         allDepartures.addAll(list1.get());
         allDepartures.addAll(list2.get());
         allDepartures.addAll(filterBusToLindholmen(list3.get()));
-        log.info("VASTTRAFIK RESPONSES RECEIVED");
+        log.debug("VASTTRAFIK RESPONSES RECEIVED");
 
         //Sort per time
         Collections.sort(allDepartures, (departure1, departure2) -> departure1.getTime().compareTo(departure2.getTime()));
@@ -106,6 +106,11 @@ public class VasttrafikController {
 
   @Async
   private Future<List<Departure>> getTransports(String fromId, String toId) {
+    return getTransports(fromId, toId, 1);
+  }
+
+  @Async
+  private Future<List<Departure>> getTransports(String fromId, String toId, int attempt) {
     VTToken token = tokenStore.getToken();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
@@ -132,7 +137,11 @@ public class VasttrafikController {
       log.debug(responseEntity.getBody().getServertime());
       return new AsyncResult<>(responseEntity.getBody().getDeparture());
     } catch (RestClientException e) {
-      log.error("Exception from vasttrafik! Returning empty list...", e);
+      if(attempt < 3) {
+        log.info("Exception from vasttrafik! Retrying ({}/3)", attempt);
+        return getTransports(fromId, toId, attempt + 1);
+      }
+      log.error("Exception from vasttrafik! Tried three times, returning empty list...", e);
       return new AsyncResult<>(new ArrayList<>());
     }
   }
