@@ -58,8 +58,8 @@ public class VasttrafikController {
   }
 
   public VTTransportList getUpcomingTransports() {
-    VTTransportList transportList = new VTTransportList();
     if (!applicationState.screenSleeps()) {
+      VTTransportList transportList = new VTTransportList();
       List<Departure> allDepartures = new ArrayList<>();
       log.debug("REQUESTING VASTTRAFIK");
       Future<List<Departure>> list1 = getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID);
@@ -83,11 +83,12 @@ public class VasttrafikController {
             transportList.getTransports().add(transport);
           }
         }
+        return transportList;
       } catch (InterruptedException | ExecutionException e) {
         log.error("Failed to query Vasttrafik!");
       }
     }
-    return transportList;
+    return null;
   }
 
   private String getTheTime(Departure departure) {

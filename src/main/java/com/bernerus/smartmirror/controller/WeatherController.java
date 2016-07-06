@@ -29,13 +29,16 @@ public class WeatherController {
 
 
   public YrWeather getWeather() {
-    String result = restTemplate.getForObject("http://www.yr.no/place/Sweden/Västra_Götaland/Gothenburg/forecast.xml", String.class);
-    //String result = getWeatherFromFile();
+    if (!applicationState.screenSleeps()) {
+      String result = restTemplate.getForObject("http://www.yr.no/place/Sweden/Västra_Götaland/Gothenburg/forecast.xml", String.class);
+      //String result = getWeatherFromFile();
 
-    log.info("Requesting YrWeather");
-    YrWeather weather = YrXmlParser.readYrXml(result);
-    log.info("Received weather times: " + weather.getWeatherDatas().size());
-    return weather;
+      log.info("Requesting YrWeather");
+      YrWeather weather = YrXmlParser.readYrXml(result);
+      log.info("Received weather times: " + weather.getWeatherDatas().size());
+      return weather;
+    }
+    return null;
   }
 
   private String getWeatherFromFile() {

@@ -105,6 +105,7 @@ public class EyeSensorRestHandler {
     } else {
       applicationState.setScreenSleeps(false);
       CompletableFuture.runAsync(() -> webSocketHandler.requestTransportsNow());
+      CompletableFuture.runAsync(() -> webSocketHandler.requestWeatherNow());
     }
 
     String url = "http://192.168.0.18:5000/" + onOrOff;

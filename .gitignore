@@ -25,3 +25,4 @@ src/main/webapp/node
 src/main/webapp/node_modules
 
 smartmirror.log
+smartmirror.*.log

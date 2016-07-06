@@ -39,6 +39,7 @@ body.smartmirror-body {
 }
 .weather-widget {
   margin-top: 50px;
+  margin-right: -5px;
 }
 .weather-widget .weather-from-time {
   font-size: 1.25em;
@@ -51,7 +52,7 @@ body.smartmirror-body {
 }
 .weather-widget .weather-wrapper {
   float: right;
-  padding-right: 75px;
+  padding-right: 0px;
 }
 .weather-widget .weather-wrapper .weather-icon {
   width: 150px;

@@ -91,10 +91,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   public void requestTransportsNow() {
     if(isEmpty(previouslyFetchedUpcomingTransports) || previouslyFetchedUpcomingTransportsTime.plusSeconds(30).isBefore(LocalDateTime.now())) {
-      previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
       previouslyFetchedUpcomingTransports = vasttrafikController.getUpcomingTransports();
+      if(previouslyFetchedUpcomingTransports != null) {
+        previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
+      }
     } else {
-      log.info("Recently fetched data. Returning it instead of fetching again.");
+      log.info("Recently fetched västtrafik data. Returning it instead of fetching again.");
     }
     sendMessage(previouslyFetchedUpcomingTransports);
   }
@@ -129,8 +131,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   public void requestWeatherNow() {
     if(previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
-      previouslyFetchedWeatherTime = LocalDateTime.now();
       previouslyFetchedWeather = weatherController.getWeather();
+      if(previouslyFetchedWeather != null) {
+        previouslyFetchedWeatherTime = LocalDateTime.now();
+      }
     } else {
       log.info("Recently fetched weather data. Returning it instead of fetching again.");
     }
