@@ -45,6 +45,11 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
       //$scope.weather = broadcastMessage.weatherMessage;
     });
 
+    $scope.$on('nowPlayingMessage', function(event, broadcastMessage) {
+      $scope.nowPlaying = broadcastMessage;
+      console.log($scope.nowPlaying);
+    });
+
     $scope.$on('socketClose', function(event, wsEvent) {
         setTimeout(function() {
           $scope.reloads = $scope.reloads + 1;
@@ -69,3 +74,9 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
     tick();
     $interval(tick, 1000);
   }]);
+  /*
+  Application name	Smartmirror
+  API key	252dc026a57846110647f5cfecee77c3
+  Shared secret	2a49073dff46e1c71cc5856d6fa33c4e
+  Registered to	wimpbeef
+  */

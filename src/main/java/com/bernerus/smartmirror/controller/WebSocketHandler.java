@@ -2,6 +2,7 @@ package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.MirrorMessage;
+import com.bernerus.smartmirror.dto.NowPlaying;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
@@ -30,12 +31,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   ScheduledExecutorService vasttrafikExecutor;
   ScheduledExecutorService weatherExecutor;
+  ScheduledExecutorService lastFmExecutor;
 
   @Autowired
   VasttrafikController vasttrafikController;
 
   @Autowired
   WeatherController weatherController;
+
+  @Autowired
+  LastFmController lastFmController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
 
@@ -46,13 +51,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
   LocalDateTime previouslyFetchedWeatherTime = LocalDateTime.MIN;
 
   private String mirrorMessage = "";
+  private NowPlaying lastPlaying;
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
     log.info("Opened new session in instance " + this);
+    lastPlaying = null;
     this.sessions.put(session.getId(), session);
     this.subscribeForDepartures();
     this.subscribeForWeather();
+    this.subscribeForNowPlaying();
     this.sendMessage(new MirrorMessage(this.mirrorMessage));
   }
 
@@ -85,6 +93,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
       if(weatherExecutor != null) {
         log.info("Killing weatherExecutor");
         weatherExecutor.shutdown();
+      }
+      if(lastFmExecutor != null) {
+        log.info("Killing lastFmExecutor");
+        lastFmExecutor.shutdown();
+        lastPlaying = null;
       }
     }
   }
@@ -139,6 +152,27 @@ public class WebSocketHandler extends TextWebSocketHandler {
       log.info("Recently fetched weather data. Returning it instead of fetching again.");
     }
     sendMessage(previouslyFetchedWeather);
+  }
+
+  private void subscribeForNowPlaying() {
+    sendTextMessage("messageSocket opened! Now Playing subscription set up.");
+    if (lastFmExecutor == null || (lastFmExecutor.isShutdown() || lastFmExecutor.isTerminated())) {
+      log.info("Creating new lastFmExecutor with now playing poll task!");
+      lastFmExecutor = Executors.newScheduledThreadPool(1);
+      lastFmExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
+    } else {
+      log.info("lastFmExecutor already running...");
+      requestNowPlaying();
+    }
+  }
+
+  public void requestNowPlaying() {
+    NowPlaying nowPlaying = lastFmController.getNowPlaying();
+    log.debug(nowPlaying.toString());
+    if(!nowPlaying.equals(lastPlaying)) {
+      lastPlaying = nowPlaying;
+      sendMessage(lastPlaying);
+    }
   }
 
   private void sendTextMessage(final String message) {

@@ -8,7 +8,7 @@
 				<p class="clock">{{ clock | date:'HH:mm:ss'}}</p>
 			</div>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-6 weather-widget-col">
 			<div class="weather-widget">
 				<div class="col-md-12 clearfix" ng-repeat="weather in weathers" >
 					<div class="weather-from-time" ng-class="{'not-first': $index != 0}">
@@ -26,6 +26,19 @@
 					<div class="weather-to-time" ng-show="$index == weathers.length - 1">
 						{{weather.toDateTimeString}}
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<div class="now-playing-widget clearfix">
+				<div ng-show="nowPlaying.playing">
+					<span class="glyphicon glyphicon-music"></span>
+					<span>{{nowPlaying.songTitle}}</span><br>
+					<span>{{nowPlaying.albumName}}</span><br>
+					<span>{{nowPlaying.artistName}}</span>
 				</div>
 			</div>
 		</div>

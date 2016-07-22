@@ -37,6 +37,10 @@ body.smartmirror-body {
 .messages-widget {
   font-size: 40px;
 }
+.weather-widget-col {
+  overflow: visible;
+  height: 170px;
+}
 .weather-widget {
   margin-top: 50px;
   margin-right: -5px;
@@ -68,4 +72,9 @@ body.smartmirror-body {
 .weather-widget .weather-wrapper .weather-data .weather-precipitation {
   font-size: 1.5em;
   padding-left: 10px;
+}
+.now-playing-widget .glyphicon {
+  font-size: 5em;
+  float: left;
+  margin-right: 20px;
 }
