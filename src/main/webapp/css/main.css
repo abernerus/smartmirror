@@ -74,7 +74,19 @@ body.smartmirror-body {
   padding-left: 10px;
 }
 .now-playing-widget .glyphicon {
-  font-size: 5em;
+  font-size: 7em;
   float: left;
   margin-right: 20px;
+}
+.now-playing-widget .song-title {
+  font-size: 2em;
+  line-height: 1.2em;
+}
+.now-playing-widget .album-title {
+  font-size: 1.4em;
+  line-height: 1.6em;
+}
+.now-playing-widget .artist-name {
+  font-size: 1.6em;
+  line-height: 1.6em;
 }
