@@ -18,6 +18,7 @@ hs_err_pid*
 
 #idea
 .idea/
+*.iml
 
 #generated webapp stuff
 src/main/webapp/components
