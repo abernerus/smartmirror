@@ -13,11 +13,8 @@ public class VTTransport {
 
   public VTTransport(String name, String stopName, List<Long> timeLeftList) {
     this.name = name;
-    this.timeLeftList = timeLeftList.stream().map(l -> {
-      if(l > 0) {
-        return new VTTimeLeft(l, calculateHurryStatus(stopName, l));
-      }
-      return null;
+    this.timeLeftList = timeLeftList.stream().filter(l -> l > 0).map(l -> {
+      return new VTTimeLeft(l, calculateHurryStatus(stopName, l));
     }).collect(Collectors.toList());
 
     Collections.sort(this.timeLeftList, (departure1, departure2) -> departure1.getTimeLeft().compareTo(departure2.getTimeLeft()));
