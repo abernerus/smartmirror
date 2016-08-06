@@ -1,74 +1,64 @@
 package com.bernerus.smartmirror.api;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by andreas on 24/01/16.
  */
 public class VTTransport {
   private String name;
-  private String arrivalTime;
-  private long timeLeft;
-  private HurryStatus hurryStatus;
+  private List<VTTimeLeft> timeLeftList;
 
-  public VTTransport(String name, String arrivalDate, String arrivalTime, String stopName) {
+  public VTTransport(String name, String stopName, List<Long> timeLeftList) {
     this.name = name;
-    this.arrivalTime = arrivalTime;
+    this.timeLeftList = timeLeftList.stream().map(l -> {
+      return new VTTimeLeft(l, calculateHurryStatus(stopName, l));
+    }).collect(Collectors.toList());
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    LocalDateTime arriveDateTime = LocalDateTime.parse(arrivalDate + " " + arrivalTime, formatter);
+    Collections.sort(this.timeLeftList, (departure1, departure2) -> departure1.getTimeLeft().compareTo(departure2.getTimeLeft()));
+  }
 
-    long arriveMs = arriveDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    long nowMs = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-    this.timeLeft = (arriveMs - nowMs) / 1000 / 60;
-
-    if(timeLeft <= 0) {
-      setMyHurryInt(HurryStatus.DEPARTED);
+  private HurryStatus calculateHurryStatus(String stopName, long timeLeft) {
+    if (timeLeft <= 0) {
+      return HurryStatus.DEPARTED;
     }
-    if(stopName.equals("Munkebäcksmotet, Göteborg")) {
-      if(timeLeft > 0 && timeLeft < 5) {
-        setMyHurryInt(HurryStatus.GOING_TO_MISS_IT);
-      } else if(timeLeft >= 5 && timeLeft < 8) {
-        setMyHurryInt(HurryStatus.RUN);
-      } else if(timeLeft >=8 && timeLeft < 10) {
-        setMyHurryInt(HurryStatus.WALK);
-      } else if(timeLeft >= 10 && timeLeft < 12) {
-        setMyHurryInt(HurryStatus.CHILL_WALK);
-      } else {
-        setMyHurryInt(HurryStatus.DO_NOT_LEAVE_YET);
+    HurryStatus hurry = HurryStatus.DO_NOT_LEAVE_YET;
+    if (stopName.equals("Munkebäcksmotet, Göteborg")) {
+      if (timeLeft > 0 && timeLeft < 5) {
+        hurry = HurryStatus.GOING_TO_MISS_IT;
+      } else if (timeLeft >= 5 && timeLeft < 8) {
+        hurry = HurryStatus.RUN;
+      } else if (timeLeft >= 8 && timeLeft < 10) {
+        hurry = HurryStatus.WALK;
+      } else if (timeLeft >= 10 && timeLeft < 12) {
+        hurry = HurryStatus.CHILL_WALK;
       }
-    } else if(stopName.equals("Ättehögsgatan, Göteborg")) {
-      if(timeLeft > 0 && timeLeft < 3) {
-        setMyHurryInt(HurryStatus.GOING_TO_MISS_IT);
-      } else if(timeLeft >= 3 && timeLeft < 4) {
-        setMyHurryInt(HurryStatus.RUN);
-      } else if(timeLeft >=5 && timeLeft < 6) {
-        setMyHurryInt(HurryStatus.WALK);
-      } else if(timeLeft >= 6 && timeLeft < 8) {
-        setMyHurryInt(HurryStatus.CHILL_WALK);
-      } else {
-        setMyHurryInt(HurryStatus.DO_NOT_LEAVE_YET);
+    } else if (stopName.equals("Ättehögsgatan, Göteborg")) {
+      if (timeLeft > 0 && timeLeft < 3) {
+        hurry = HurryStatus.GOING_TO_MISS_IT;
+      } else if (timeLeft >= 3 && timeLeft < 4) {
+        hurry = HurryStatus.RUN;
+      } else if (timeLeft >= 5 && timeLeft < 6) {
+        hurry = HurryStatus.WALK;
+      } else if (timeLeft >= 6 && timeLeft < 8) {
+        hurry = HurryStatus.CHILL_WALK;
       }
-    } else if(stopName.equals("Härlanda, Göteborg")) {
-      if(timeLeft > 0 && timeLeft < 6) {
-        setMyHurryInt(HurryStatus.GOING_TO_MISS_IT);
-      } else if(timeLeft >= 6 && timeLeft < 9) {
-        setMyHurryInt(HurryStatus.RUN);
-      } else if(timeLeft >=9 && timeLeft < 11) {
-        setMyHurryInt(HurryStatus.WALK);
-      } else if(timeLeft >= 11 && timeLeft < 14) {
-        setMyHurryInt(HurryStatus.CHILL_WALK);
-      } else {
-        setMyHurryInt(HurryStatus.DO_NOT_LEAVE_YET);
+    } else if (stopName.equals("Härlanda, Göteborg")) {
+      if (timeLeft > 0 && timeLeft < 6) {
+        hurry = HurryStatus.GOING_TO_MISS_IT;
+      } else if (timeLeft >= 6 && timeLeft < 9) {
+        hurry = HurryStatus.RUN;
+      } else if (timeLeft >= 9 && timeLeft < 11) {
+        hurry = HurryStatus.WALK;
+      } else if (timeLeft >= 11 && timeLeft < 14) {
+        hurry = HurryStatus.CHILL_WALK;
       }
     }
+    return hurry;
   }
-  private void setMyHurryInt(HurryStatus status) {
-    this.hurryStatus = status;
-  }
+
   public String getName() {
     return name;
   }
@@ -77,27 +67,18 @@ public class VTTransport {
     this.name = name;
   }
 
-  public String getArrivalTime() {
-    return arrivalTime;
+  public List<VTTimeLeft> getTimeLeftList() {
+    return timeLeftList;
   }
 
-  public void setArrivalTime(String arrivalTime) {
-    this.arrivalTime = arrivalTime;
+  public void setTimeLeftList(List<VTTimeLeft> timeLeftList) {
+    this.timeLeftList = timeLeftList;
   }
 
-  public long getTimeLeft() {
-    return timeLeft;
-  }
-
-  public void setTimeLeft(long timeLeft) {
-    this.timeLeft = timeLeft;
-  }
-
-  public HurryStatus getHurryStatus() {
-    return hurryStatus;
-  }
-
-  public void setHurryStatus(HurryStatus hurryStatus) {
-    this.hurryStatus = hurryStatus;
+  public Long getLeastTimeLeft(){
+    if(this.timeLeftList.size() > 0) {
+      return this.timeLeftList.get(0).getTimeLeft();
+    }
+    return Long.MAX_VALUE;
   }
 }

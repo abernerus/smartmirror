@@ -73,7 +73,9 @@
 							{{transport.name}}
 						</td>
 						<td class="time">
-							{{transport.timeLeft}} min
+							<span ng-repeat="(index, VTTimeLeft) in transport.timeLeftList" ng-if="VTTimeLeft.timeLeft > 0" class="time-left">
+								{{VTTimeLeft.timeLeft}} min
+							</span>
 						</td>
 					</tr>
 					<tr ng-show="!transports.length">

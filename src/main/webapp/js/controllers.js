@@ -20,6 +20,7 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
     }
 
     $scope.$on('transportsMessage', function(event, broadcastMessage) {
+        console.log(broadcastMessage.transports);
         $scope.transports = broadcastMessage.transports;
     });
 
