@@ -32,7 +32,7 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
 
       ws.onmessage = function(jsonMessage) {
         message = JSON.parse(jsonMessage.data);
-//        console.log(message);
+        //console.log(message);
         if(message) {
           if(typeof(message.transports) !== "undefined" ) {
             $rootScope.$broadcast('transportsMessage', {
@@ -46,7 +46,7 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
              $rootScope.$broadcast('mirrorMessage', message.mirrorMessage);
           } else if(typeof(message.weatherDatas) !== "undefined") {
              $rootScope.$broadcast('weatherMessage', message.weatherDatas);
-          } else if(typeof(message.songTitle) !== "undefined") {
+          } else if(typeof(message.title) !== "undefined") {
              $rootScope.$broadcast('nowPlayingMessage', message);
           }
         }

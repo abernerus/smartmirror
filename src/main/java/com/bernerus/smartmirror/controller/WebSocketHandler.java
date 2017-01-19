@@ -2,9 +2,9 @@ package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.MirrorMessage;
-import com.bernerus.smartmirror.dto.NowPlaying;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
+import com.bernerus.smartmirror.dto.sonos.proxy.TrackInfo;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
@@ -27,31 +27,31 @@ import java.util.concurrent.TimeUnit;
  */
 public class WebSocketHandler extends TextWebSocketHandler {
   private static org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
-  ObjectMapper mapper = new ObjectMapper();
+  private ObjectMapper mapper = new ObjectMapper();
 
-  ScheduledExecutorService vasttrafikExecutor;
-  ScheduledExecutorService weatherExecutor;
-  ScheduledExecutorService lastFmExecutor;
-
-  @Autowired
-  VasttrafikController vasttrafikController;
+  private ScheduledExecutorService vasttrafikExecutor;
+  private ScheduledExecutorService weatherExecutor;
+  private ScheduledExecutorService spotifyProxyExecutor;
 
   @Autowired
-  WeatherController weatherController;
+  private VasttrafikController vasttrafikController;
 
   @Autowired
-  LastFmController lastFmController;
+  private WeatherController weatherController;
+
+  @Autowired
+  private SonosController sonosController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
 
-  VTTransportList previouslyFetchedUpcomingTransports = null;
-  LocalDateTime previouslyFetchedUpcomingTransportsTime = LocalDateTime.MIN;
+  private VTTransportList previouslyFetchedUpcomingTransports = null;
+  private LocalDateTime previouslyFetchedUpcomingTransportsTime = LocalDateTime.MIN;
 
-  YrWeather previouslyFetchedWeather = null;
-  LocalDateTime previouslyFetchedWeatherTime = LocalDateTime.MIN;
+  private YrWeather previouslyFetchedWeather = null;
+  private LocalDateTime previouslyFetchedWeatherTime = LocalDateTime.MIN;
 
   private String mirrorMessage = "";
-  private NowPlaying lastPlaying;
+  private TrackInfo lastPlaying;
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -94,9 +94,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("Killing weatherExecutor");
         weatherExecutor.shutdown();
       }
-      if(lastFmExecutor != null) {
-        log.info("Killing lastFmExecutor");
-        lastFmExecutor.shutdown();
+      if(spotifyProxyExecutor != null) {
+        log.info("Killing spotifyExecutor");
+        spotifyProxyExecutor.shutdown();
         lastPlaying = null;
       }
     }
@@ -156,18 +156,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private void subscribeForNowPlaying() {
     sendTextMessage("messageSocket opened! Now Playing subscription set up.");
-    if (lastFmExecutor == null || (lastFmExecutor.isShutdown() || lastFmExecutor.isTerminated())) {
-      log.info("Creating new lastFmExecutor with now playing poll task!");
-      lastFmExecutor = Executors.newScheduledThreadPool(1);
-      lastFmExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
+    if (spotifyProxyExecutor == null || (spotifyProxyExecutor.isShutdown() || spotifyProxyExecutor.isTerminated())) {
+      log.info("Creating new spotifyExecutorExecutor with now playing poll task!");
+      spotifyProxyExecutor = Executors.newScheduledThreadPool(1);
+      spotifyProxyExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
     } else {
-      log.info("lastFmExecutor already running...");
+      log.info("spotifyProxyExecutor already running...");
       requestNowPlaying();
     }
   }
 
-  public void requestNowPlaying() {
-    NowPlaying nowPlaying = lastFmController.getNowPlaying();
+  private void requestNowPlaying() {
+    TrackInfo nowPlaying = sonosController.getNowPlaying();
     log.debug(nowPlaying.toString());
     if(!nowPlaying.equals(lastPlaying)) {
       lastPlaying = nowPlaying;

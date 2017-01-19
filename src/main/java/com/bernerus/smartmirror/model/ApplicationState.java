@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApplicationState {
-  private boolean screenSleeps = true;
+  private boolean screenSleeps = false;
 
   public boolean screenSleeps() {
     return screenSleeps;

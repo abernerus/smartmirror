@@ -1,10 +1,13 @@
 package com.bernerus.smartmirror.rest;
 
 import com.bernerus.smartmirror.controller.WebSocketHandler;
+import com.bernerus.smartmirror.dto.mirror.MirrorStatus;
+import com.bernerus.smartmirror.dto.spotify.proxy.NowPlaying;
 import com.bernerus.smartmirror.model.ApplicationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by andreas on 25/12/15.
- *
  */
 @Controller
 public class EyeSensorRestHandler {
@@ -47,6 +49,13 @@ public class EyeSensorRestHandler {
   @Autowired
   ApplicationState applicationState;
 
+
+  @Value("${mirror.host}")
+  private String smartMirrorHost;
+
+  @Value("${mirror.port}")
+  private String smartMirrorPort;
+
   @PostConstruct
   public void postConstruct() {
     //At startup, report movement to force screen to be turned on and status set to not sleeping!
@@ -54,7 +63,9 @@ public class EyeSensorRestHandler {
   }
 
   @RequestMapping("/reportmovement")
-  public @ResponseBody String reportMovement() {
+  public
+  @ResponseBody
+  String reportMovement() {
     LOG.debug("Movement detected!");
     this.lastMovement = LocalDateTime.now();
     String response = callMirror("on");
@@ -62,7 +73,7 @@ public class EyeSensorRestHandler {
     cancelFuture("Cancelling scheduled mirror shutdown!");
     int timeoutMinutes = 30; //Default time before mirror turn off
     int currentHour = LocalDateTime.now().getHour();
-    if(currentHour >= 23 || (currentHour >= 0 && currentHour < 5)) {
+    if (currentHour >= 23 || (currentHour >= 0 && currentHour < 5)) {
       timeoutMinutes = 5;
     }
     LOG.info("Mirror monitor shutdown scheduled to " + LocalDateTime.now().plusMinutes(timeoutMinutes));
@@ -72,7 +83,9 @@ public class EyeSensorRestHandler {
   }
 
   @RequestMapping("/reportnomovement")
-  public @ResponseBody String reportNoMovement() {
+  public
+  @ResponseBody
+  String reportNoMovement() {
     LOG.debug("Forcing no moment timeout!");
     String response = callMirror("off");
     cancelFuture("Cancelling scheduled mirror shutdown, since screen has been forced off just now!");
@@ -80,13 +93,17 @@ public class EyeSensorRestHandler {
   }
 
   @RequestMapping("/forcemovement")
-  public @ResponseBody String forceMovement() {
+  public
+  @ResponseBody
+  String forceMovement() {
     LOG.debug("Forcing moment!");
     return callMirror("on", true);
   }
 
   @RequestMapping("/screenstatus")
-  public @ResponseBody String screenstatus() {
+  public
+  @ResponseBody
+  String screenstatus() {
     return String.format("Sleeps = %b", applicationState.screenSleeps());
   }
 
@@ -95,12 +112,14 @@ public class EyeSensorRestHandler {
   }
 
   private String callMirror(final String onOrOff, final boolean force) {
-    if(!applicationState.screenSleeps() && "on".equals(onOrOff) && !force) {
+    MirrorStatus mirrorStatus = restTemplate.getForObject("http://" + smartMirrorHost + ":" + smartMirrorPort + "/status", MirrorStatus.class);
+
+    if (!mirrorStatus.isScreenSleeps() && "on".equals(onOrOff) && !force) {
       LOG.info("Detected movement but screen is already on. Ignoring...");
       return "Ignored";
     }
 
-    if("off".equals(onOrOff)) {
+    if ("off".equals(onOrOff)) {
       applicationState.setScreenSleeps(true);
     } else {
       applicationState.setScreenSleeps(false);
@@ -108,7 +127,7 @@ public class EyeSensorRestHandler {
       CompletableFuture.runAsync(() -> webSocketHandler.requestWeatherNow());
     }
 
-    String url = "http://192.168.0.18:5000/" + onOrOff;
+    String url = "http://" + smartMirrorHost + ":" + smartMirrorPort + "/" + onOrOff;
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
@@ -118,7 +137,7 @@ public class EyeSensorRestHandler {
   }
 
   private void cancelFuture(String message) {
-    if(future != null && !future.isDone()) {
+    if (future != null && !future.isDone()) {
       LOG.info(message);
       future.cancel(false);
     }
