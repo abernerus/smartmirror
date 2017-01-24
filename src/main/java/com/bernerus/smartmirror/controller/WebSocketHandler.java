@@ -4,7 +4,7 @@ import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
-import com.bernerus.smartmirror.dto.sonos.proxy.TrackInfo;
+import com.bernerus.smartmirror.dto.sonos.TrackInfo;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   @Autowired
   private WeatherController weatherController;
+
+//  @Autowired
+//  private SonosProxyController sonosProxyController;
 
   @Autowired
   private SonosController sonosController;

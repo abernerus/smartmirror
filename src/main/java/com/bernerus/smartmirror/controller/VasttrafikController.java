@@ -48,10 +48,10 @@ public class VasttrafikController {
   private final VasttrafikTokenStore tokenStore = VasttrafikTokenStore.getInstance();
 
   @Autowired
-  RestTemplate restTemplate;
+  private RestTemplate restTemplate;
 
   @Autowired
-  ApplicationState applicationState;
+  private ApplicationState applicationState;
 
   public String killToken() {
     tokenStore.killToken();
@@ -154,7 +154,7 @@ public class VasttrafikController {
       log.debug(responseEntity.getBody().getServertime());
       return new AsyncResult<>(responseEntity.getBody().getDeparture());
     } catch (RestClientException e) {
-      if(attempt < 3) {
+      if (attempt < 3) {
         log.info("Exception from vasttrafik! Retrying ({}/3)", attempt);
         return getTransports(fromId, toId, attempt + 1);
       }

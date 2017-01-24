@@ -1,7 +1,7 @@
 package com.bernerus.smartmirror.rest;
 
 import com.bernerus.smartmirror.controller.SonosController;
-import com.bernerus.smartmirror.dto.sonos.proxy.TrackInfo;
+import com.bernerus.smartmirror.dto.sonos.TrackInfo;
 import com.bernerus.smartmirror.model.ApplicationState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
