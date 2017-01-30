@@ -38,6 +38,11 @@ import java.util.stream.Collectors;
  */
 @Service
 public class VasttrafikController {
+  public static final String SORHALLSTORGET_ID = "9021014002238000";
+  public static final String LINDHOLMEN_ID = "9021014004490000";
+  public static final String LINDHOLMSPIREN_ID = "9021014004493000";
+  public static final String ERIKSBERG_FARJELAGE_ID = "9021014002239000";
+  public static final String KLIPPAN_ID = "9021014003890000";
   public static final String MUNKEBACKSMOTET_ID = "9021014004840000";
   public static final String ATTEHOGSGATAN_ID = "9021014007750000";
   public static final String HARLANDA_ID = "9021014003310000";
@@ -63,17 +68,15 @@ public class VasttrafikController {
       VTTransportList transportList = new VTTransportList();
       List<Departure> allDepartures = new ArrayList<>();
       log.debug("REQUESTING VASTTRAFIK");
-      Future<List<Departure>> list1 = getTransports(MUNKEBACKSMOTET_ID, SVINGELN_ID);
-      Future<List<Departure>> list2 = getTransports(ATTEHOGSGATAN_ID, SVINGELN_ID);
-      Future<List<Departure>> list2b = getTransports(ATTEHOGSGATAN_ID, KORSVAGEN_ID);
-      Future<List<Departure>> list3 = getTransports(HARLANDA_ID, SVINGELN_ID);
+      Future<List<Departure>> list1 = getTransports(SORHALLSTORGET_ID, LINDHOLMEN_ID);
+      Future<List<Departure>> list2 = getTransports(ERIKSBERG_FARJELAGE_ID, KLIPPAN_ID);
+      Future<List<Departure>> list3 = getTransports(ERIKSBERG_FARJELAGE_ID, LINDHOLMSPIREN_ID);
 
       try {
         log.debug("GETTING RESPONSES FROM VT...");
         allDepartures.addAll(list1.get());
         allDepartures.addAll(list2.get());
-        allDepartures.addAll(list2b.get());
-        allDepartures.addAll(filterBusToLindholmen(list3.get()));
+        allDepartures.addAll(list3.get());
         log.debug("VASTTRAFIK RESPONSES RECEIVED");
 
         Map<String, List<Departure>> groupedDepartures = allDepartures.stream().collect(Collectors.groupingBy(Departure::getName));
@@ -97,7 +100,7 @@ public class VasttrafikController {
 
         });
 
-        Collections.sort(transportList.getTransports(), (departure1, departure2) -> departure1.getLeastTimeLeft().compareTo(departure2.getLeastTimeLeft()));
+        (transportList.getTransports()).sort(Comparator.comparing(VTTransport::getLeastTimeLeft));
 
         return transportList;
       } catch (InterruptedException | ExecutionException e) {
@@ -111,16 +114,6 @@ public class VasttrafikController {
     return departure.getRtTime() != null ? departure.getRtTime() : departure.getTime();
   }
 
-  private List<Departure> filterBusToLindholmen(List<Departure> departures) {
-    ArrayList<Departure> filteredList = new ArrayList<>();
-    for (Departure departure : departures) {
-      if (departure.getDirection().startsWith("Lindholmen")) {
-        filteredList.add(departure);
-      }
-    }
-    return filteredList;
-  }
-
   @Async
   private Future<List<Departure>> getTransports(String fromId, String toId) {
     return getTransports(fromId, toId, 1);
@@ -130,7 +123,7 @@ public class VasttrafikController {
   private Future<List<Departure>> getTransports(String fromId, String toId, int attempt) {
     VTToken token = tokenStore.getToken();
     HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
     headers.add("Authorization", "Bearer " + token.getAccessKey());
     headers.add("Cache-Control", "no-cache");
     headers.add("Pragma", "no-cache");
