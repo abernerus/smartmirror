@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 
 @Service
 public class SonosController {
-  private static final Logger LOG = LoggerFactory.getLogger(SonosProxyController.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SonosController.class);
 
   @Value("${sonos.host}")
   private String sonosHost;

@@ -1,0 +1,18 @@
+#!/bin/bash
+# SmartMirror
+#
+# description: SmartMirror App
+
+case $1 in
+    start)
+        /bin/bash /home/pi/apps/smartmirror/start.sh
+    ;;
+    stop)
+        /bin/bash /home/pi/apps/smartmirror/stop.sh
+    ;;
+    restart)
+        /bin/bash /home/pi/apps/smartmirror/stop.sh
+        /bin/bash /home/pi/apps/smartmirror/start.sh
+    ;;
+esac
+exit 0
