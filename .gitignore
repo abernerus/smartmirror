@@ -10,6 +10,7 @@
 
 # Apple shit
 *.AppleDouble
+.DS_Store
 
 target
 

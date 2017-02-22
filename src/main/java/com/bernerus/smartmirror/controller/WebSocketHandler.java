@@ -1,7 +1,6 @@
 package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
-import com.bernerus.smartmirror.config.SonosActive;
 import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
@@ -10,7 +9,6 @@ import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -43,10 +41,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
   @Autowired
   private WeatherController weatherController;
 
-//  @Autowired
-//  private SonosProxyController sonosProxyController;
-
-  //@Autowired
+  @Autowired
   private SonosController sonosController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
@@ -93,15 +88,15 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     if (sessions.size() == 0) {
       log.warn("All sessions closed.");
-      if(vasttrafikExecutor != null) {
+      if (vasttrafikExecutor != null) {
         log.info("Killing vasttrafikExecutor");
         vasttrafikExecutor.shutdown();
       }
-      if(weatherExecutor != null) {
+      if (weatherExecutor != null) {
         log.info("Killing weatherExecutor");
         weatherExecutor.shutdown();
       }
-      if(spotifyProxyExecutor != null) {
+      if (spotifyProxyExecutor != null) {
         log.info("Killing spotifyExecutor");
         spotifyProxyExecutor.shutdown();
         lastPlaying = null;
@@ -110,9 +105,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   public void requestTransportsNow() {
-    if(isEmpty(previouslyFetchedUpcomingTransports) || previouslyFetchedUpcomingTransportsTime.plusSeconds(30).isBefore(LocalDateTime.now())) {
+    if (isEmpty(previouslyFetchedUpcomingTransports) || previouslyFetchedUpcomingTransportsTime.plusSeconds(30).isBefore(LocalDateTime.now())) {
       previouslyFetchedUpcomingTransports = vasttrafikController.getUpcomingTransports();
-      if(previouslyFetchedUpcomingTransports != null) {
+      if (previouslyFetchedUpcomingTransports != null) {
         previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
       }
     } else {
@@ -150,9 +145,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   public void requestWeatherNow() {
-    if(previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
+    if (previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
       previouslyFetchedWeather = weatherController.getWeather();
-      if(previouslyFetchedWeather != null) {
+      if (previouslyFetchedWeather != null) {
         previouslyFetchedWeatherTime = LocalDateTime.now();
       }
     } else {
@@ -176,7 +171,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
   private void requestNowPlaying() {
     TrackInfo nowPlaying = sonosController.getNowPlaying();
     log.debug(nowPlaying.toString());
-    if(!nowPlaying.equals(lastPlaying)) {
+    if (!nowPlaying.equals(lastPlaying)) {
       lastPlaying = nowPlaying;
       sendMessage(lastPlaying);
     }
