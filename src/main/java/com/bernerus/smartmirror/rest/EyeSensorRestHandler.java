@@ -1,5 +1,6 @@
 package com.bernerus.smartmirror.rest;
 
+import com.bernerus.smartmirror.config.EyeSensorActive;
 import com.bernerus.smartmirror.controller.WebSocketHandler;
 import com.bernerus.smartmirror.dto.mirror.MirrorStatus;
 import com.bernerus.smartmirror.dto.spotify.proxy.NowPlaying;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * Created by andreas on 25/12/15.
  */
 @Controller
+@Conditional(EyeSensorActive.class)
 public class EyeSensorRestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(EyeSensorRestHandler.class);
   LocalDateTime lastMovement;

@@ -1,6 +1,6 @@
 package com.bernerus.smartmirror.controller;
 
-
+import com.bernerus.smartmirror.config.SonosActive;
 import com.bernerus.smartmirror.dto.sonos.SonosGetPositionInfoResponse;
 import com.bernerus.smartmirror.dto.sonos.SonosTrackMetaData;
 import com.bernerus.smartmirror.dto.sonos.TrackInfo;
@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
+@Conditional(SonosActive.class)
 public class SonosController {
   private static final Logger LOG = LoggerFactory.getLogger(SonosController.class);
 

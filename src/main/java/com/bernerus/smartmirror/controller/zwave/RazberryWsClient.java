@@ -1,5 +1,6 @@
 package com.bernerus.smartmirror.controller.zwave;
 
+import com.bernerus.smartmirror.config.RazberryActive;
 import com.bernerus.smartmirror.controller.zwave.http.RazberryRgbHttpClient;
 import com.bernerus.smartmirror.model.zwave.HttpClientConfig;
 import com.bernerus.smartmirror.model.zwave.RGBColor;
@@ -8,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -32,6 +33,7 @@ import java.util.Map;
  */
 @Component
 @ClientEndpoint
+@Conditional(RazberryActive.class)
 public class RazberryWsClient extends TextWebSocketHandler {
   private static final Logger LOG = LoggerFactory.getLogger(RazberryWsClient.class);
   private static final String BIG_BEDBOX_SENSOR = "ZWayVDev_zway_5-0-48-1";

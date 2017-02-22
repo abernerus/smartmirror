@@ -1,6 +1,7 @@
 package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
+import com.bernerus.smartmirror.config.SonosActive;
 import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
@@ -9,6 +10,8 @@ import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by andreas on 03/03/16.
  */
+@Controller
 public class WebSocketHandler extends TextWebSocketHandler {
   private static org.slf4j.Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
   private ObjectMapper mapper = new ObjectMapper();
@@ -42,7 +46,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 //  @Autowired
 //  private SonosProxyController sonosProxyController;
 
-  @Autowired
+  //@Autowired
   private SonosController sonosController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
