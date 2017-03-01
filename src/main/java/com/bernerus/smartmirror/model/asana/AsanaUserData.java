@@ -9,9 +9,8 @@ public class AsanaUserData {
   private Long id;
   private String email;
   private String name;
-  private String photo;
+  private AsanaPhoto photo;
   private List<AsanaWorkspace> workspaces;
-
 
   public Long getId() {
     return id;
@@ -37,11 +36,11 @@ public class AsanaUserData {
     this.name = name;
   }
 
-  public String getPhoto() {
+  public AsanaPhoto getPhoto() {
     return photo;
   }
 
-  public void setPhoto(String photo) {
+  public void setPhoto(AsanaPhoto photo) {
     this.photo = photo;
   }
 
