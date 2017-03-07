@@ -3,7 +3,7 @@ package com.bernerus.smartmirror.model.asana;
 /**
  * Created by andreas on 2017-03-01.
  */
-public class AsanaWorkspace {
+public class AsanaTask {
   private Long id;
   private String name;
 
