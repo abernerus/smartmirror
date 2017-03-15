@@ -4,19 +4,19 @@ package com.bernerus.smartmirror.model.websocket;
  * Created by andreas on 2017-03-15.
  */
 public class MirrorWebSocketMessage<T> {
-  private final MessageType messageType;
-  private final T message;
+  private final MessageType type;
+  private final T content;
 
-  public MirrorWebSocketMessage(MessageType messageType, T message) {
-    this.messageType = messageType;
-    this.message = message;
+  public MirrorWebSocketMessage(MessageType type, T content) {
+    this.type = type;
+    this.content = content;
   }
 
-  public MessageType getMessageType() {
-    return messageType;
+  public MessageType getType() {
+    return type;
   }
 
-  public T getMessage() {
-    return message;
+  public T getContent() {
+    return content;
   }
 }

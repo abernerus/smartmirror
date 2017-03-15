@@ -6,6 +6,9 @@ import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
 import com.bernerus.smartmirror.dto.sonos.TrackInfo;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
+import com.bernerus.smartmirror.model.asana.AsanaTasks;
+import com.bernerus.smartmirror.model.websocket.MessageType;
+import com.bernerus.smartmirror.model.websocket.MirrorWebSocketMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
   private ScheduledExecutorService vasttrafikExecutor;
   private ScheduledExecutorService weatherExecutor;
   private ScheduledExecutorService spotifyProxyExecutor;
+  private ScheduledExecutorService asanaProxyExecutor;
 
   @Autowired
   private VasttrafikController vasttrafikController;
@@ -43,6 +47,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   @Autowired
   private SonosController sonosController;
+
+  @Autowired
+  private AsanaController asanaController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
 
@@ -63,7 +70,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     this.subscribeForDepartures();
     this.subscribeForWeather();
     this.subscribeForNowPlaying();
-    this.sendMessage(new MirrorMessage(this.mirrorMessage));
+    this.subscribeForAsanaTasks();
+    this.sendMessage(new MirrorWebSocketMessage<>(MessageType.TEXT, new MirrorMessage(this.mirrorMessage)));
   }
 
   @Override
@@ -113,7 +121,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     } else {
       log.info("Recently fetched västtrafik data. Returning it instead of fetching again.");
     }
-    sendMessage(previouslyFetchedUpcomingTransports);
+    sendMessage(new MirrorWebSocketMessage<>( MessageType.TRANSPORTS, previouslyFetchedUpcomingTransports));
   }
 
   private boolean isEmpty(VTTransportList transportList) {
@@ -153,7 +161,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     } else {
       log.info("Recently fetched weather data. Returning it instead of fetching again.");
     }
-    sendMessage(previouslyFetchedWeather);
+    sendMessage(new MirrorWebSocketMessage<>( MessageType.WEATHER, previouslyFetchedWeather));
   }
 
   private void subscribeForNowPlaying() {
@@ -168,20 +176,39 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
   }
 
+  private void subscribeForAsanaTasks() {
+    sendTextMessage("messageSocket opened! Asana tasks subscription set up.");
+    if (asanaProxyExecutor == null || (asanaProxyExecutor.isShutdown() || asanaProxyExecutor.isTerminated())) {
+      log.info("Creating new asanaProxyExecutor with Asana tasks poll task!");
+      asanaProxyExecutor = Executors.newScheduledThreadPool(1);
+      asanaProxyExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
+    } else {
+      log.info("asanaProxyExecutor already running...");
+      requestAsanaTasks();
+    }
+  }
+
+
   private void requestNowPlaying() {
     TrackInfo nowPlaying = sonosController.getNowPlaying();
     log.debug(nowPlaying.toString());
     if (!nowPlaying.equals(lastPlaying)) {
       lastPlaying = nowPlaying;
-      sendMessage(lastPlaying);
+      sendMessage(new MirrorWebSocketMessage<>(MessageType.NOW_PLAYING, lastPlaying));
     }
   }
 
-  private void sendTextMessage(final String message) {
-    sendMessage(new SimpleTextMessage(message));
+  private void requestAsanaTasks() {
+    AsanaTasks tasks = asanaController.getAsanaTasks();
+    log.debug(tasks.toString());
+    sendMessage(new MirrorWebSocketMessage<>(MessageType.TASKS, tasks.getData()));
   }
 
-  private void sendMessage(Object o) {
+  private void sendTextMessage(final String message) {
+    sendMessage(new MirrorWebSocketMessage<>(MessageType.TEXT, new SimpleTextMessage(message)));
+  }
+
+  private void sendMessage(MirrorWebSocketMessage o) {
     sessions.values().stream().filter(WebSocketSession::isOpen).forEach(session -> {
       try {
         session.sendMessage(new TextMessage(mapper.writeValueAsString(o)));
@@ -192,11 +219,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   public void sendTemperatureToConsumers(float temperature) {
-    sendMessage(new Temperature(temperature));
+    sendMessage(new MirrorWebSocketMessage<>(MessageType.TEMPERATURE, new Temperature(temperature)));
   }
 
   public void sendMessageToConsumers(String message) {
     this.mirrorMessage = message;
-    sendMessage(new MirrorMessage(message));
+    sendMessage(new MirrorWebSocketMessage<>( MessageType.TEXT, new MirrorMessage(message)));
   }
 }
