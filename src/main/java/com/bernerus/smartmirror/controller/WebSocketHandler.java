@@ -41,7 +41,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
   @Autowired
   private WeatherController weatherController;
 
-  //@Autowired
+  @Autowired
   private SonosController sonosController;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();

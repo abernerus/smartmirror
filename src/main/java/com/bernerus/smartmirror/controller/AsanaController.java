@@ -38,8 +38,7 @@ public class AsanaController {
         return response.getBody();
     }
 
-    @PostConstruct
-    public void init() {
+    public AsanaTasks getAsanaTasks() {
         AsanaProjects projects = callAsana("projects", AsanaProjects.class);
         AsanaProjectData smartMirrorProject = projects.getData()
                 .stream()
@@ -50,6 +49,7 @@ public class AsanaController {
             AsanaTasks tasks = callAsana("projects/" + smartMirrorProject.getId() + "/tasks" , AsanaTasks.class);
             log.info("Found the following tasks in the project:");
             tasks.getData().forEach(task -> log.info(task.getName()));
+            return tasks;
         }
         else{
             log.warn("Could not find an Asana Project called Smartmirror");
