@@ -32,22 +32,26 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
 
       ws.onmessage = function(jsonMessage) {
         message = JSON.parse(jsonMessage.data);
-        //console.log(message);
+        console.log(message.type);
         if(message) {
-          if(typeof(message.transports) !== "undefined" ) {
+          if(message.type == "TRANSPORTS") {
             $rootScope.$broadcast('transportsMessage', {
-              transports: message.transports
+              transports: message.content.transports
             });
-          } else if(typeof(message.temperature) !== "undefined") {
+          } else if(message.type == "TEMPERATURE") {
             $rootScope.$broadcast('temperatureMessage', {
-              temperature: message.temperature
+              temperature: message.content.temperature
             });
-          } else if(typeof(message.mirrorMessage) !== "undefined") {
-             $rootScope.$broadcast('mirrorMessage', message.mirrorMessage);
-          } else if(typeof(message.weatherDatas) !== "undefined") {
-             $rootScope.$broadcast('weatherMessage', message.weatherDatas);
-          } else if(typeof(message.title) !== "undefined") {
-             $rootScope.$broadcast('nowPlayingMessage', message);
+          } else if(message.type == "TEXT") {
+             $rootScope.$broadcast('mirrorMessage', message.content.mirrorMessage);
+          } else if(message.type == "WEATHER") {
+             $rootScope.$broadcast('weatherMessage', message.content.weatherDatas);
+          } else if(message.type == "NOW_PLAYING") {
+             $rootScope.$broadcast('nowPlayingMessage', message.content);
+          } else if(message.type == "TASKS") {
+                  console.log(message.content);
+
+             $rootScope.$broadcast('tasks', message.content);
           }
         }
       };

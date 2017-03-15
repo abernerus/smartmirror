@@ -50,10 +50,10 @@ public class AsanaController {
             log.info("Found the following tasks in the project:");
             tasks.getData().forEach(task -> log.info(task.getName()));
             return tasks;
-        }
-        else{
+        } else {
             log.warn("Could not find an Asana Project called Smartmirror");
         }
+        return new AsanaTasks();
 
     }
 }

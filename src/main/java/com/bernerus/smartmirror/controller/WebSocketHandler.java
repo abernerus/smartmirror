@@ -181,7 +181,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     if (asanaProxyExecutor == null || (asanaProxyExecutor.isShutdown() || asanaProxyExecutor.isTerminated())) {
       log.info("Creating new asanaProxyExecutor with Asana tasks poll task!");
       asanaProxyExecutor = Executors.newScheduledThreadPool(1);
-      asanaProxyExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
+      asanaProxyExecutor.scheduleAtFixedRate(this::requestAsanaTasks, 0, 5, TimeUnit.SECONDS);
     } else {
       log.info("asanaProxyExecutor already running...");
       requestAsanaTasks();
