@@ -61,6 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private String mirrorMessage = "";
   private TrackInfo lastPlaying;
+  private AsanaTasks lastTasks = null;
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -200,8 +201,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private void requestAsanaTasks() {
     AsanaTasks tasks = asanaController.getAsanaTasks();
-    log.debug(tasks.toString());
-    sendMessage(new MirrorWebSocketMessage<>(MessageType.TASKS, tasks.getData()));
+    if(!tasks.equals(lastTasks)) {
+      lastTasks = tasks;
+      log.debug(tasks.toString());
+      sendMessage(new MirrorWebSocketMessage<>(MessageType.TASKS, tasks.getData()));
+    }
   }
 
   private void sendTextMessage(final String message) {
