@@ -51,6 +51,11 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
       console.log($scope.nowPlaying);
     });
 
+    $scope.$on('tasks', function(event, broadcastMessage) {
+          $scope.tasks = broadcastMessage;
+          console.log($scope.tasks);
+    });
+
     $scope.$on('socketClose', function(event, wsEvent) {
         setTimeout(function() {
           $scope.reloads = $scope.reloads + 1;

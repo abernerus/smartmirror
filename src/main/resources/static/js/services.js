@@ -49,8 +49,6 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
           } else if(message.type == "NOW_PLAYING") {
              $rootScope.$broadcast('nowPlayingMessage', message.content);
           } else if(message.type == "TASKS") {
-                  console.log(message.content);
-
              $rootScope.$broadcast('tasks', message.content);
           }
         }

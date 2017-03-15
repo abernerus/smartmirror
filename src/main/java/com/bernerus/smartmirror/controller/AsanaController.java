@@ -48,7 +48,7 @@ public class AsanaController {
       .findFirst().orElse(null);
     if (smartMirrorProject != null) {
       log.debug("Found Asana Project");
-      AsanaTasks tasks = callAsana("projects/" + smartMirrorProject.getId() + "/tasks", AsanaTasks.class);
+      AsanaTasks tasks = callAsana("projects/" + smartMirrorProject.getId() + "/tasks?completed_since=now", AsanaTasks.class);
       if (log.isDebugEnabled()) {
         log.debug("Found the following tasks in the project:");
         tasks.getData().forEach(task -> log.debug(task.getName()));
