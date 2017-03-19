@@ -110,6 +110,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         spotifyProxyExecutor.shutdown();
         lastPlaying = null;
       }
+      if (asanaProxyExecutor != null) {
+        log.info("Killing asanaExecutur");
+        asanaProxyExecutor.shutdown();
+        lastTasks = null;
+      }
     }
   }
 

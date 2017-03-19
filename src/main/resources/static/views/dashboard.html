@@ -48,9 +48,9 @@
 		<div class="col-md-9">
 			<div class="tasks-widget clearfix">
 				<div>
-					<span class="glyphicon glyphicon-ok"></span>
-					<span class="tasks-header">Att Göra</span><br>
+					<span class="tasks-header"> {{tasksHeader}}</span><br>
 					<div ng-repeat="task in tasks" >
+						<span class="glyphicon glyphicon-ok"></span>
 						<span class="task-name">{{task.name}}</span>
 					</div>
 				</div>
