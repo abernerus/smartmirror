@@ -7,11 +7,13 @@ public class YrWeatherSymbol {
 
   private final String name;
   private final Integer number;
+  private final String var;
 
-  public YrWeatherSymbol(String name, Integer number) {
+  public YrWeatherSymbol(String name, Integer number, String var) {
 
     this.name = name;
     this.number = number;
+    this.var = var;
   }
 
   public String getName() {
@@ -21,4 +23,6 @@ public class YrWeatherSymbol {
   public Integer getNumber() {
     return number;
   }
+
+  public String getVar(){ return var; }
 }

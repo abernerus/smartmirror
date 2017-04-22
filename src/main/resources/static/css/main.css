@@ -81,6 +81,7 @@ body.smartmirror-body {
 }
 .weather-widget .weather-wrapper .weather-data {
   float: left;
+  width: 100px;
 }
 .weather-widget .weather-wrapper .weather-data .weather-temperature {
   font-size: 4em;

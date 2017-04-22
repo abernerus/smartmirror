@@ -48,7 +48,7 @@ public final class YrXmlParser {
           YrWeatherData weatherData = new YrWeatherData(from, to);
 
           Element symbolElement = (Element) eElement.getElementsByTagName("symbol").item(0);
-          weatherData.setSymbol(new YrWeatherSymbol(symbolElement.getAttribute("name"), Integer.parseInt(symbolElement.getAttribute("number"))));
+          weatherData.setSymbol(new YrWeatherSymbol(symbolElement.getAttribute("name"), Integer.parseInt(symbolElement.getAttribute("number")), symbolElement.getAttribute("var")));
 
           Element precipitationElement = (Element) eElement.getElementsByTagName("precipitation").item(0);
           weatherData.setPrecipitation(new YrPrecipitation(

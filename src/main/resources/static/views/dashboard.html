@@ -11,11 +11,12 @@
 		<div class="col-md-6 weather-widget-col">
 			<div class="weather-widget">
 				<div class="col-md-12 clearfix" ng-repeat="weather in weathers" >
-					<div class="weather-from-time" ng-class="{'not-first': $index != 0}">
+					<div class="weather-from-time">
 						{{weather.fromDateTimeString}}
 					</div>
 
-					<div class="weather-wrapper clearfix" ng-class="{'not-last': $index != weathers.length - 1}">
+					<div class="weather-wrapper clearfix">
+						<!--<img ng-src="img/yr_symbols/{{weather.symbol.var}}.png" class="weather-icon">-->
 						<img ng-src="img/weather/{{weather.symbol.number}}.png" class="weather-icon">
 						<div class="weather-data">
 							<div class="weather-temperature">{{weather.temperature}}°</div>
