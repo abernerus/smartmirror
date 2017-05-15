@@ -14,10 +14,9 @@
 					<div class="weather-from-time">
 						{{weather.fromDateTimeString}}
 					</div>
-
 					<div class="weather-wrapper clearfix">
-						<!--<img ng-src="img/yr_symbols/{{weather.symbol.var}}.png" class="weather-icon">-->
-						<img ng-src="img/weather/{{weather.symbol.number}}.png" class="weather-icon">
+						<img ng-src="img/yr_symbols/{{weather.symbol.var}}.png" ng-show="weatherIconType == 'color'" class="weather-icon">
+						<img ng-src="img/weather/{{weather.symbol.number}}.png" ng-show="weatherIconType == 'flat'" class="weather-icon">
 						<div class="weather-data">
 							<div class="weather-temperature">{{weather.temperature}}°</div>
 							<div class="weather-precipitation">{{weather.precipitation.value}} mm</div>

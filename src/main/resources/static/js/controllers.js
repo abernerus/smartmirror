@@ -33,16 +33,16 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
     });
 
     $scope.$on('weatherMessage', function(event, weatherMessage) {
-
+      console.log(weatherMessage)
+      $scope.weatherIconType = weatherMessage.iconType;
       $scope.weathers = [];
       for(i = 0; i < 3; i++) {
-        var weather = weatherMessage[i];
+        var weather = weatherMessage.weatherDatas[i];
         console.log(weather);
         weather.toDateTimeString = getDateTimeString(weather.toDateTime)
         weather.fromDateTimeString = getDateTimeString(weather.fromDateTime)
         $scope.weathers.push(weather);
       }
-      console.log($scope.weathers)
       //$scope.weather = broadcastMessage.weatherMessage;
     });
 
