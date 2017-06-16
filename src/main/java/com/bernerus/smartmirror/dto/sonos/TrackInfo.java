@@ -1,5 +1,7 @@
 package com.bernerus.smartmirror.dto.sonos;
 
+import static java.util.Objects.nonNull;
+
 /**
  * Created by andreas on 04/01/17.
  */
@@ -15,7 +17,10 @@ public class TrackInfo {
   }
 
   private String decode(String s) {
-    return s.replaceAll("&apos;", "'").replaceAll("&amp;", "&");
+    if(nonNull(s)){
+      return s.replaceAll("&apos;", "'").replaceAll("&amp;", "&");
+    }
+    return "";
   }
 
   @Override
