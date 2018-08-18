@@ -119,15 +119,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   public void requestTransportsNow() {
-    if (isEmpty(previouslyFetchedUpcomingTransports) || previouslyFetchedUpcomingTransportsTime.plusSeconds(30).isBefore(LocalDateTime.now())) {
-      previouslyFetchedUpcomingTransports = vasttrafikController.getUpcomingTransports();
-      if (previouslyFetchedUpcomingTransports != null) {
-        previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
+    try {
+      if (isEmpty(previouslyFetchedUpcomingTransports) || previouslyFetchedUpcomingTransportsTime.plusSeconds(30).isBefore(LocalDateTime.now())) {
+        previouslyFetchedUpcomingTransports = vasttrafikController.getUpcomingTransports();
+        if (previouslyFetchedUpcomingTransports != null) {
+          previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
+        }
+      } else {
+        log.info("Recently fetched västtrafik data. Returning it instead of fetching again.");
       }
-    } else {
-      log.info("Recently fetched västtrafik data. Returning it instead of fetching again.");
+      sendMessage(new MirrorWebSocketMessage<>(MessageType.TRANSPORTS, previouslyFetchedUpcomingTransports));
+    } catch (Throwable e) {
+      // Catching everything to not halt the scheduler
+      log.error("Error requesting transports!", e);
     }
-    sendMessage(new MirrorWebSocketMessage<>( MessageType.TRANSPORTS, previouslyFetchedUpcomingTransports));
   }
 
   private boolean isEmpty(VTTransportList transportList) {
@@ -159,15 +164,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   public void requestWeatherNow() {
-    if (previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
-      previouslyFetchedWeather = weatherController.getWeather();
-      if (previouslyFetchedWeather != null) {
-        previouslyFetchedWeatherTime = LocalDateTime.now();
+    try {
+      if (previouslyFetchedWeather == null || previouslyFetchedWeatherTime.plusMinutes(45).isBefore(LocalDateTime.now())) {
+        previouslyFetchedWeather = weatherController.getWeather();
+        if (previouslyFetchedWeather != null) {
+          previouslyFetchedWeatherTime = LocalDateTime.now();
+        }
+      } else {
+        log.info("Recently fetched weather data. Returning it instead of fetching again.");
       }
-    } else {
-      log.info("Recently fetched weather data. Returning it instead of fetching again.");
+      sendMessage(new MirrorWebSocketMessage<>(MessageType.WEATHER, previouslyFetchedWeather));
+    } catch (Throwable e) {
+      // Catching everything to not halt the scheduler
+      log.error("Error requesting weather!", e);
     }
-    sendMessage(new MirrorWebSocketMessage<>( MessageType.WEATHER, previouslyFetchedWeather));
   }
 
   private void subscribeForNowPlaying() {
@@ -180,6 +190,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
       log.info("spotifyProxyExecutor already running...");
       requestNowPlaying();
     }
+
   }
 
   private void subscribeForAsanaTasks() {
@@ -192,24 +203,34 @@ public class WebSocketHandler extends TextWebSocketHandler {
       log.info("asanaProxyExecutor already running...");
       requestAsanaTasks();
     }
+
   }
 
-
   private void requestNowPlaying() {
-    TrackInfo nowPlaying = sonosController.getNowPlaying();
-    log.debug(nowPlaying.toString());
-    if (!nowPlaying.equals(lastPlaying)) {
-      lastPlaying = nowPlaying;
-      sendMessage(new MirrorWebSocketMessage<>(MessageType.NOW_PLAYING, lastPlaying));
+    try {
+      TrackInfo nowPlaying = sonosController.getNowPlaying();
+      log.debug(nowPlaying.toString());
+      if (!nowPlaying.equals(lastPlaying)) {
+        lastPlaying = nowPlaying;
+        sendMessage(new MirrorWebSocketMessage<>(MessageType.NOW_PLAYING, lastPlaying));
+      }
+    } catch (Throwable e) {
+      // Catching everything to not halt the scheduler
+      log.error("Error requesting transports!", e);
     }
   }
 
   private void requestAsanaTasks() {
-    AsanaTasks tasks = asanaController.getAsanaTasks();
-    if(!tasks.equals(lastTasks)) {
-      lastTasks = tasks;
-      log.debug(tasks.toString());
-      sendMessage(new MirrorWebSocketMessage<>(MessageType.TASKS, tasks.getData()));
+    try {
+      AsanaTasks tasks = asanaController.getAsanaTasks();
+      if (!tasks.equals(lastTasks)) {
+        lastTasks = tasks;
+        log.debug(tasks.toString());
+        sendMessage(new MirrorWebSocketMessage<>(MessageType.TASKS, tasks.getData()));
+      }
+    } catch (Throwable e) {
+      // Catching everything to not halt the scheduler
+      log.error("Error requesting todos!", e);
     }
   }
 
@@ -233,6 +254,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   public void sendMessageToConsumers(String message) {
     this.mirrorMessage = message;
-    sendMessage(new MirrorWebSocketMessage<>( MessageType.TEXT, new MirrorMessage(message)));
+    sendMessage(new MirrorWebSocketMessage<>(MessageType.TEXT, new MirrorMessage(message)));
   }
 }

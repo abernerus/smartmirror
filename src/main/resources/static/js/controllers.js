@@ -52,7 +52,7 @@ smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$ht
     });
 
     $scope.$on('tasks', function(event, broadcastMessage) {
-          $scope.tasksHeader = 'Att Göra';
+          $scope.tasksHeader = 'To do';
           $scope.tasks = broadcastMessage;
           console.log($scope.tasks);
     });

@@ -1,0 +1,20 @@
+<GetPositionInfoResponse xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
+    <Track>1</Track>
+    <TrackDuration>0:04:11</TrackDuration>
+    <TrackMetaData>
+        <res protocolInfo="http-get:*:audio/x-spotify:*" duration="0:04:11">x-sonos-spotify:spotify%3atrack%3a42rrPJg1u7rX7Rx52taVVn?sid=9&amp;amp;flags=0&amp;amp;sn=1</res>
+        <albumArtURI>https://i.scdn.co/image/c65679b8ea3c47cdbc8284db76e394ec3ef67bb3</albumArtURI>
+        <class>object.item.audioItem.musicTrack</class>
+        <title>Black Vultures</title>
+        <creator>Halestorm</creator>
+        <albumArtist>Halestorm</albumArtist>
+        <album>Vicious</album>
+        <trackGain>0.000000</trackGain>
+        <tiid>7950fabb1b4e65b7ff86bcc5331d167f</tiid>
+    </TrackMetaData>
+    <TrackURI>x-sonos-spotify:spotify%3atrack%3a42rrPJg1u7rX7Rx52taVVn?sid=9&amp;flags=0&amp;sn=1</TrackURI>
+    <RelTime>0:00:24</RelTime>
+    <AbsTime>NOT_IMPLEMENTED</AbsTime>
+    <RelCount>2147483647</RelCount>
+    <AbsCount>2147483647</AbsCount>
+</GetPositionInfoResponse>

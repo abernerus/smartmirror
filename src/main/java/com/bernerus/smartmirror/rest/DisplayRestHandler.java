@@ -106,6 +106,7 @@ public class DisplayRestHandler {
       return tvServiceController.getStatusRaw();
     }
 
+    LOG.info("Got mirror command: " + command);
     TvServiceStatus mirrorStatus = tvServiceController.getStatus();
     if (mirrorStatus.equals(TvServiceStatus.ON) && TURN_ON.equals(command) && !force) {
       LOG.info("Got on command but mirror is already on. Ignoring...");
