@@ -4,6 +4,7 @@ import com.bernerus.smartmirror.dto.sonos.SonosGetPositionInfoResponse;
 import com.bernerus.smartmirror.dto.sonos.SonosTrackMetaData;
 import com.bernerus.smartmirror.dto.sonos.TrackInfo;
 import com.bernerus.smartmirror.model.ApplicationState;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +33,7 @@ public class SonosController {
   private static final Logger LOG = LoggerFactory.getLogger(SonosController.class);
   private static String infoSoapAction = "urn:schemas-upnp-org:service:AVTransport:1#GetPositionInfo";
   private static String infoSoapBody = "<u:GetPositionInfo xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:GetPositionInfo>";
-  private static String infoUrl = "/MediaRenderer/AVTransport/Control";
+  private static String infoPath = "/MediaRenderer/AVTransport/Control";
   private static String playSoapAction = "urn:schemas-upnp-org:service:AVTransport:1#Play";
   private static String playSoapBody = "<u:Play xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Play>";
   private static String playUrl = "/MediaRenderer/AVTransport/Control";
@@ -49,11 +53,12 @@ public class SonosController {
   private static String soapBodyEnd = "</s:Body></s:Envelope>";
   @Autowired
   ApplicationState applicationState;
-  @Value("${sonos.host}")
-  private String sonosHost;
+  @Value("${sonos.hosts}")
+  private String sonosHosts;
   @Value("${sonos.port}")
   private String sonosPort;
-  private String baseUrl;
+  private String activeSonosUrl;
+  private List<String> baseUrls = new ArrayList<>();
   //private static String  baseUrl = "http://192.168.1.200:1400";
   private JAXBContext getPositionInfoResponseContext;
 
@@ -74,8 +79,11 @@ public class SonosController {
 
   @PostConstruct
   public void init() {
-    baseUrl = "http://" + sonosHost + ":" + sonosPort;
-    LOG.info("SONOS: " + baseUrl);
+    Arrays.stream(sonosHosts.split(",")).forEach(sonosHost -> {
+      baseUrls.add("http://" + sonosHost + ":" + sonosPort);
+    });
+    activeSonosUrl = baseUrls.get(0);
+    LOG.info("SONOS: {}", baseUrls);
 
     try {
       getPositionInfoResponseContext = JAXBContext.newInstance(SonosGetPositionInfoResponse.class);
@@ -86,18 +94,38 @@ public class SonosController {
 
   public TrackInfo getNowPlaying() {
     if (!applicationState.screenSleeps()) {
-      LOG.debug("Requesting Spotify data from playbar @ {}:{}", sonosHost, sonosPort);
       try {
-        String content = execute(infoUrl, infoSoapAction, infoSoapBody);
-        InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-        SonosGetPositionInfoResponse sonosResponse = (SonosGetPositionInfoResponse) getPositionInfoResponseContext.createUnmarshaller().unmarshal(stream);
-        SonosTrackMetaData track = sonosResponse.getTrackMetaData();
-        return new TrackInfo(track.getAlbum(), track.getAlbumArtist(), track.getTitle());
+        TrackInfo track = getSonosTrackFromUrl(activeSonosUrl);
+        if(track == null) {
+          //Find in other configured sonos urls
+          for (String sonosUrl : baseUrls) {
+            track = getSonosTrackFromUrl(sonosUrl);
+            if(track != null) {
+              activeSonosUrl = sonosUrl;
+              return track;
+            }
+          }
+        } else {
+          return track;
+        }
+        return TrackInfo.empty();
       } catch (Exception e) {
         LOG.error("Error getting last played", e);
       }
     }
     return TrackInfo.empty();
+  }
+
+  private TrackInfo getSonosTrackFromUrl(String sonosUrl) throws IOException, JAXBException {
+    LOG.debug("Requesting Spotify data from sonos device @ {}", sonosUrl);
+    String content = execute(sonosUrl, infoPath, infoSoapAction, infoSoapBody);
+    InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    SonosGetPositionInfoResponse sonosResponse = (SonosGetPositionInfoResponse) getPositionInfoResponseContext.createUnmarshaller().unmarshal(stream);
+    SonosTrackMetaData track = sonosResponse.getTrackMetaData();
+    if(StringUtils.isNotEmpty(track.getAlbumArtist())) {
+      return new TrackInfo(track.getAlbum(), track.getAlbumArtist(), track.getTitle());
+    }
+    return null;
   }
 
   private void playSpotify(String code, Integer volume, Integer sleep, boolean forever) {
@@ -123,30 +151,30 @@ public class SonosController {
   private void setVolume(Integer volume) throws IOException {
     String body = setVolumeSoapBody.replace("${volume}", volume.toString());
 
-    execute(setVolumeUrl, setVolumeSoapAction, body);
+    execute(activeSonosUrl, setVolumeUrl, setVolumeSoapAction, body);
   }
 
   private void enqueueSpotify(String code) throws IOException {
     String body = enqueueSoapBody.replace("${code}", code);
 
-    execute(enqueueUrl, enqueueSoapAction, body);
+    execute(activeSonosUrl, enqueueUrl, enqueueSoapAction, body);
   }
 
   private void resetQueue() throws IOException {
-    execute(resetQueueUrl, resetQueueSoapAction, resetQueueSoapBody);
+    execute(activeSonosUrl, resetQueueUrl, resetQueueSoapAction, resetQueueSoapBody);
   }
 
   private void play() throws IOException {
-    execute(playUrl, playSoapAction, playSoapBody);
+    execute(activeSonosUrl, playUrl, playSoapAction, playSoapBody);
   }
 
   private void pause() {
     ExecutorService executor = Executors.newSingleThreadExecutor();
     executor.submit(() -> {
       try {
-        execute(pauseUrl, pauseSoapAction, pauseSoapBody);
+        execute(activeSonosUrl, pauseUrl, pauseSoapAction, pauseSoapBody);
         String body = setVolumeSoapBody.replace("${volume}", "20");
-        execute(setVolumeUrl, setVolumeSoapAction, body);
+        execute(activeSonosUrl, setVolumeUrl, setVolumeSoapAction, body);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -155,18 +183,16 @@ public class SonosController {
 
   }
 
-  private String execute(String url, String soapAction, String body) throws IOException {
+  private String execute(String baseUrl, String url, String soapAction, String body) throws IOException {
     body = getSoapBody(body);
     String endpoint = baseUrl + url;
     URL _url = new URL(endpoint);
 
     HttpURLConnection conn = (HttpURLConnection) _url.openConnection();
 
-
     conn.setRequestProperty("SOAPACTION", soapAction);
     conn.setRequestProperty("CONTENT-TYPE", "text/xml; charset=\"utf-8\"");
     conn.setRequestProperty("CONNECTION", "close");
-
 
     conn.setReadTimeout(10000 /* milliseconds */);
     conn.setConnectTimeout(15000 /* milliseconds */);
@@ -176,12 +202,10 @@ public class SonosController {
     conn.setDoOutput(true);
     conn.connect();
 
-    if (body != null) {
-      OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-      out.write(body);
-      out.close();
+    OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+    out.write(body);
+    out.close();
 
-    }
     int response = conn.getResponseCode();
     InputStream is = null;
     is = conn.getInputStream();
@@ -213,6 +237,5 @@ public class SonosController {
     trimmedXml = trimmedXml.replaceAll("&([^;&]+(?!(?:\\\\w|;)))", "&amp;$1");
     return trimmedXml;
   }
-
 
 }

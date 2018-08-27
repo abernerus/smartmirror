@@ -14,6 +14,6 @@ public class SonosActive implements org.springframework.context.annotation.Condi
 
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-        return Boolean.valueOf(conditionContext.getEnvironment().getProperty("eyesensor.active"));
+        return Boolean.valueOf(conditionContext.getEnvironment().getProperty("sonos.active"));
     }
 }
