@@ -1,6 +1,14 @@
 <div class="container-fluid">
-	<div class="reload-widget"  style="display:none">
+	<div class="reload-widget" style="display:none">
 		<p class="reloads">{{reloads}}</p>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="date-widget">
+				<p class="date">{{ clock | date:'yyyy-MM-dd'}}<span>Vecka {{weekNumber}}</span></p>
+			</div>
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-6">
@@ -10,7 +18,7 @@
 		</div>
 		<div class="col-md-6 weather-widget-col">
 			<div class="weather-widget">
-				<div class="col-md-12 clearfix" ng-repeat="weather in weathers" >
+				<div class="col-md-12 clearfix" ng-repeat="weather in weathers">
 					<div class="weather-from-time">
 						{{weather.fromDateTimeString}}
 					</div>
@@ -31,26 +39,34 @@
 		</div>
 	</div>
 
-	<div class="row">
+	<div class="row" ng-show="nowPlaying != null">
 		<div class="col-md-9">
 			<div class="now-playing-widget clearfix">
 				<div>
-					<span class="glyphicon glyphicon-music"></span>
+					<span ng-show="nowPlayingPaused == false" class="glyphicon glyphicon-music"></span>
+					<span ng-show="nowPlayingPaused == true" class="glyphicon glyphicon-pause" style="top:-1px;"></span>
 					<span class="song-title">{{nowPlaying.title}}</span><br>
 					<span class="album-title">{{nowPlaying.album}}</span><br>
 					<span class="artist-name">{{nowPlaying.artist}}</span>
+				</div>
+				<div>
+					<div class="progress" style="height:5px; width: 75%; margin-top: 10px; background-color: #555;">
+						<div class="progress-bar" role="progressbar"
+						     style="width: {{(nowPlaying.timePassed / nowPlaying.duration) * 100}}%; background-color: #fff;"
+						     aria-valuenow="{{nowPlaying.timePassed}}" aria-valuemin="0" aria-valuemax="{{nowPlaying.duration}}"></div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="row">
+	<div class="row" ng-show="tasks.length > 0">
 		<div class="col-md-9">
 			<div class="tasks-widget clearfix">
 				<div>
 					<span class="tasks-header"> {{tasksHeader}}</span><br>
-					<div ng-repeat="task in tasks" >
-						<span class="glyphicon glyphicon-ok"></span>
+					<div ng-repeat="task in tasks">
+						<span class="glyphicon glyphicon-unchecked"></span>
 						<span class="task-name">{{task.name}}</span>
 					</div>
 				</div>

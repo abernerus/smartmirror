@@ -1,89 +1,92 @@
 var smartMirrorControllers = angular.module('smartMirrorControllers', []);
 
 smartMirrorControllers.controller('DashController', ['$scope', '$interval', '$http', 'VtService', '$location', '$routeParams', '$window',
-  function ($scope, $interval, $http, VtService, $location, $routeParams, $window) {
-    var tick = function() {
-      $scope.clock = Date.now();
-    }
-    if(typeof($routeParams.reloads) === "undefined") {
-      $scope.reloads = 0;
-    } else {
-      $scope.reloads = parseInt($routeParams.reloads);
-    }
-    VtService.refreshSocket();
+    function ($scope, $interval, $http, VtService, $location, $routeParams, $window) {
+        var tick = function () {
+            var today = new Date();
+            $scope.clock = today;
+            $scope.weekNumber = today.getWeek();
+        };
+        if (typeof($routeParams.reloads) === "undefined") {
+            $scope.reloads = 0;
+        } else {
+            $scope.reloads = parseInt($routeParams.reloads);
+        }
+        VtService.refreshSocket();
 
-    //Oldschool REST Call :)
-    var fetchTransports = function() {
-      $http.get("/upcoming").then(function(response) {
-        $scope.transports = response.data.transports;
-      });
-    }
+        //Oldschool REST Call :)
+        var fetchTransports = function () {
+            $http.get("/upcoming").then(function (response) {
+                $scope.transports = response.data.transports;
+            });
+        }
 
-    $scope.$on('transportsMessage', function(event, broadcastMessage) {
-        console.log(broadcastMessage.transports);
-        $scope.transports = broadcastMessage.transports;
-    });
+        $scope.$on('transportsMessage', function (event, broadcastMessage) {
+            $scope.transports = broadcastMessage.transports;
+        });
 
-    $scope.$on('temperatureMessage', function(event, broadcastMessage) {
-        $scope.temperature = broadcastMessage.temperature;
-    });
+        $scope.$on('temperatureMessage', function (event, broadcastMessage) {
+            $scope.temperature = broadcastMessage.temperature;
+        });
 
-    $scope.$on('mirrorMessage', function(event, broadcastMessage) {
-      $scope.mirrorMessage = broadcastMessage;
-    });
+        $scope.$on('mirrorMessage', function (event, broadcastMessage) {
+            $scope.mirrorMessage = broadcastMessage;
+        });
 
-    $scope.$on('weatherMessage', function(event, weatherMessage) {
-      console.log(weatherMessage)
-      $scope.weatherIconType = weatherMessage.iconType;
-      $scope.weathers = [];
-      for(i = 0; i < 3; i++) {
-        var weather = weatherMessage.weatherDatas[i];
-        console.log(weather);
-        weather.toDateTimeString = getDateTimeString(weather.toDateTime)
-        weather.fromDateTimeString = getDateTimeString(weather.fromDateTime)
-        $scope.weathers.push(weather);
-      }
-      //$scope.weather = broadcastMessage.weatherMessage;
-    });
+        $scope.$on('weatherMessage', function (event, weatherMessage) {
+            $scope.weatherIconType = weatherMessage.iconType;
+            $scope.weathers = [];
+            for (i = 0; i < 3; i++) {
+                var weather = weatherMessage.weatherDatas[i];
+                weather.toDateTimeString = getDateTimeString(weather.toDateTime)
+                weather.fromDateTimeString = getDateTimeString(weather.fromDateTime)
+                $scope.weathers.push(weather);
+            }
+            //$scope.weather = broadcastMessage.weatherMessage;
+        });
 
-    $scope.$on('nowPlayingMessage', function(event, broadcastMessage) {
-      $scope.nowPlaying = broadcastMessage;
-      console.log($scope.nowPlaying);
-    });
+        $scope.$on('nowPlayingMessage', function (event, broadcastMessage) {
+            $scope.nowPlaying = broadcastMessage;
+            $scope.nowPlayingPaused = false;
+        });
 
-    $scope.$on('tasks', function(event, broadcastMessage) {
-          $scope.tasksHeader = 'To do';
-          $scope.tasks = broadcastMessage;
-          console.log($scope.tasks);
-    });
+        $scope.$on('nowPlayingPausedMessage', function (event, broadcastMessage) {
+            $scope.nowPlaying = broadcastMessage;
+            $scope.nowPlayingPaused = true;
+        });
 
-    $scope.$on('socketClose', function(event, wsEvent) {
-        setTimeout(function() {
-          $scope.reloads = $scope.reloads + 1;
-          VtService.refreshSocket();
-        }, 5000);
-    });
+        $scope.$on('tasks', function (event, broadcastMessage) {
+            $scope.tasksHeader = 'To do';
+            $scope.tasks = broadcastMessage;
+        });
 
-    function getDateTimeString(dateTime) {
-      var hour = dateTime.hour + "";
-      if(dateTime.hour < 10) {
-        hour = "0" + dateTime.hour;
-      }
+        $scope.$on('socketClose', function (event, wsEvent) {
+            setTimeout(function () {
+                $scope.reloads = $scope.reloads + 1;
+                VtService.refreshSocket();
+            }, 5000);
+        });
 
-      var min = dateTime.minute + "";
-      if(dateTime.minute < 10) {
-        min = "0" + dateTime.minute;
-      }
+        function getDateTimeString(dateTime) {
+            var hour = dateTime.hour + "";
+            if (dateTime.hour < 10) {
+                hour = "0" + dateTime.hour;
+            }
 
-      return hour + ":" + min;
-    }
+            var min = dateTime.minute + "";
+            if (dateTime.minute < 10) {
+                min = "0" + dateTime.minute;
+            }
 
-    tick();
-    $interval(tick, 1000);
-  }]);
-  /*
-  Application name	Smartmirror
-  API key	252dc026a57846110647f5cfecee77c3
-  Shared secret	2a49073dff46e1c71cc5856d6fa33c4e
-  Registered to	wimpbeef
-  */
+            return hour + ":" + min;
+        }
+
+        tick();
+        $interval(tick, 1000);
+    }]);
+/*
+Application name	Smartmirror
+API key	252dc026a57846110647f5cfecee77c3
+Shared secret	2a49073dff46e1c71cc5856d6fa33c4e
+Registered to	wimpbeef
+*/

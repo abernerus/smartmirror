@@ -26,7 +26,13 @@
     </appender>
 
     <logger name="com.bernerus.smartmirror" additivity="false">
-        <level value="INFO" />
+        <level value="info" />
+        <appender-ref ref="dailyRollingFileAppender"/>
+        <appender-ref ref="consoleAppender" />
+    </logger>
+
+    <logger name="com.bernerus.smartmirror.controller.sonos" additivity="false">
+        <level value="info" />
         <appender-ref ref="dailyRollingFileAppender"/>
         <appender-ref ref="consoleAppender" />
     </logger>

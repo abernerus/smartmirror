@@ -116,7 +116,6 @@ public class TvServiceController {
         headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-        LOG.info(response.toString());
         String responseBody = response.getBody();
         return TvServiceCommandResponse.success(responseBody);
     }

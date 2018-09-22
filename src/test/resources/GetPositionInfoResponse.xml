@@ -1,0 +1,20 @@
+<GetPositionInfoResponse xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
+    <Track>1</Track>
+    <TrackDuration>0:02:42</TrackDuration>
+    <TrackMetaData>
+        <res protocolInfo="http-get:*:audio/x-spotify:*" duration="0:02:42">x-sonos-spotify:spotify%3atrack%3a7sGUv00CPJhdgKp7TmjRdG?sid=9&amp;amp;flags=0&amp;amp;sn=1</res>
+        <albumArtURI>https://i.scdn.co/image/9998a521e190eb3c85ee2a18a1722f9b8a609acc</albumArtURI>
+        <class>object.item.audioItem.musicTrack</class>
+        <title>Starfields</title>
+        <creator>Hallman</creator>
+        <albumArtist>Hallman</albumArtist>
+        <album>Starfields</album>
+        <trackGain>0.000000</trackGain>
+        <tiid>d37c97ada839cc380cecf5ab1a2aa307</tiid>
+    </TrackMetaData>
+    <TrackURI>x-sonos-spotify:spotify%3atrack%3a7sGUv00CPJhdgKp7TmjRdG?sid=9&amp;flags=0&amp;sn=1</TrackURI>
+    <RelTime>0:02:40</RelTime>
+    <AbsTime>NOT_IMPLEMENTED</AbsTime>
+    <RelCount>2147483647</RelCount>
+    <AbsCount>2147483647</AbsCount>
+</GetPositionInfoResponse>

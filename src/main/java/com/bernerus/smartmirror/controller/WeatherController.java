@@ -39,14 +39,14 @@ public class WeatherController {
       String result = restTemplate.getForObject("http://www.yr.no/place/Sweden/Västra_Götaland/Gothenburg/forecast.xml", String.class);
       //String result = getWeatherFromFile();
 
-      log.info("Requesting YrWeather");
+      log.debug("Requesting YrWeather");
       YrWeather weather = YrXmlParser.readYrXml(result);
       if(FLAT_ICON_TYPE.equals(weatherIconType)) {
         weather.setIconType("flat");
       } else {
         weather.setIconType("color");
       }
-      log.info("Received weather times: " + weather.getWeatherDatas().size());
+      log.debug("Received weather times: " + weather.getWeatherDatas().size());
       return weather;
     }
     return null;

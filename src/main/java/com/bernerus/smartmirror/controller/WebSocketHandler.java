@@ -1,14 +1,16 @@
 package com.bernerus.smartmirror.controller;
 
 import com.bernerus.smartmirror.api.VTTransportList;
+import com.bernerus.smartmirror.controller.sonos.SonosController;
+import com.bernerus.smartmirror.controller.sonos.SonosScheduledExecutor;
 import com.bernerus.smartmirror.dto.MirrorMessage;
 import com.bernerus.smartmirror.dto.SimpleTextMessage;
 import com.bernerus.smartmirror.dto.Temperature;
-import com.bernerus.smartmirror.dto.sonos.TrackInfo;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.bernerus.smartmirror.model.asana.AsanaTasks;
 import com.bernerus.smartmirror.model.websocket.MessageType;
 import com.bernerus.smartmirror.model.websocket.MirrorWebSocketMessage;
+import com.bernerus.smartmirror.model.websocket.WsMessageSender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,20 +38,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private ScheduledExecutorService vasttrafikExecutor;
   private ScheduledExecutorService weatherExecutor;
-  private ScheduledExecutorService spotifyProxyExecutor;
+
   private ScheduledExecutorService asanaProxyExecutor;
 
-  @Autowired
   private VasttrafikController vasttrafikController;
-
-  @Autowired
   private WeatherController weatherController;
-
-  @Autowired
-  private SonosController sonosController;
-
-  @Autowired
   private AsanaController asanaController;
+
+  private SonosScheduledExecutor sonosScheduledExecutor;
 
   private Map<String, WebSocketSession> sessions = new HashMap<>();
 
@@ -60,13 +56,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
   private LocalDateTime previouslyFetchedWeatherTime = LocalDateTime.MIN;
 
   private String mirrorMessage = "";
-  private TrackInfo lastPlaying;
   private AsanaTasks lastTasks = null;
+
+  @Autowired
+  public WebSocketHandler(VasttrafikController vasttrafikController, WeatherController weatherController, AsanaController asanaController, SonosController sonosController) {
+    this.vasttrafikController = vasttrafikController;
+    this.weatherController = weatherController;
+    this.asanaController = asanaController;
+    this.sonosScheduledExecutor = new SonosScheduledExecutor(new WsMessageSender(this::send), sonosController);
+  }
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
     log.info("Opened new session in instance " + this);
-    lastPlaying = null;
     this.sessions.put(session.getId(), session);
     this.subscribeForDepartures();
     this.subscribeForWeather();
@@ -105,11 +107,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("Killing weatherExecutor");
         weatherExecutor.shutdown();
       }
-      if (spotifyProxyExecutor != null) {
-        log.info("Killing spotifyExecutor");
-        spotifyProxyExecutor.shutdown();
-        lastPlaying = null;
-      }
+      sonosScheduledExecutor.stop();
       if (asanaProxyExecutor != null) {
         log.info("Killing asanaExecutur");
         asanaProxyExecutor.shutdown();
@@ -126,7 +124,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
           previouslyFetchedUpcomingTransportsTime = LocalDateTime.now();
         }
       } else {
-        log.info("Recently fetched västtrafik data. Returning it instead of fetching again.");
+        log.debug("Recently fetched västtrafik data. Returning it instead of fetching again.");
       }
       sendMessage(new MirrorWebSocketMessage<>(MessageType.TRANSPORTS, previouslyFetchedUpcomingTransports));
     } catch (Throwable e) {
@@ -171,7 +169,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
           previouslyFetchedWeatherTime = LocalDateTime.now();
         }
       } else {
-        log.info("Recently fetched weather data. Returning it instead of fetching again.");
+        log.debug("Recently fetched weather data. Returning it instead of fetching again.");
       }
       sendMessage(new MirrorWebSocketMessage<>(MessageType.WEATHER, previouslyFetchedWeather));
     } catch (Throwable e) {
@@ -181,15 +179,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
   }
 
   private void subscribeForNowPlaying() {
+    sonosScheduledExecutor.start();
     sendTextMessage("messageSocket opened! Now Playing subscription set up.");
-    if (spotifyProxyExecutor == null || (spotifyProxyExecutor.isShutdown() || spotifyProxyExecutor.isTerminated())) {
-      log.info("Creating new spotifyExecutorExecutor with now playing poll task!");
-      spotifyProxyExecutor = Executors.newScheduledThreadPool(1);
-      spotifyProxyExecutor.scheduleAtFixedRate(this::requestNowPlaying, 0, 5, TimeUnit.SECONDS);
-    } else {
-      log.info("spotifyProxyExecutor already running...");
-      requestNowPlaying();
-    }
+
 
   }
 
@@ -206,19 +198,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   }
 
-  private void requestNowPlaying() {
-    try {
-      TrackInfo nowPlaying = sonosController.getNowPlaying();
-      log.debug(nowPlaying.toString());
-      if (!nowPlaying.equals(lastPlaying)) {
-        lastPlaying = nowPlaying;
-        sendMessage(new MirrorWebSocketMessage<>(MessageType.NOW_PLAYING, lastPlaying));
-      }
-    } catch (Throwable e) {
-      // Catching everything to not halt the scheduler
-      log.error("Error requesting transports!", e);
-    }
-  }
+
 
   private void requestAsanaTasks() {
     try {
@@ -236,6 +216,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
   private void sendTextMessage(final String message) {
     sendMessage(new MirrorWebSocketMessage<>(MessageType.TEXT, new SimpleTextMessage(message)));
+  }
+
+  public <T>void send(MessageType type, T content) {
+    sendMessage(new MirrorWebSocketMessage<>(type, content));
   }
 
   private void sendMessage(MirrorWebSocketMessage o) {

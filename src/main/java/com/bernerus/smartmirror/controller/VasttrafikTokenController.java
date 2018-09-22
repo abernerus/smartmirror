@@ -76,7 +76,7 @@ public final class VasttrafikTokenController {
 
         //Map it to  a more useful object
         VTToken token = new VTToken(expires, vtTokenResponse.getAccess_token());
-        log.info("New token received with key: " + token.getAccessKey());
+        log.debug("New token received with key: " + token.getAccessKey());
         return token;
       } catch (RestClientException e) {
         log.error("Could not get new token :( Retrying!", e);

@@ -4,5 +4,5 @@ package com.bernerus.smartmirror.model.websocket;
  * Created by andreas on 2017-03-15.
  */
 public enum MessageType {
-  TRANSPORTS, NOW_PLAYING, TEXT, WEATHER, TASKS, TEMPERATURE
+  TRANSPORTS, NOW_PLAYING, TEXT, WEATHER, TASKS, TEMPERATURE, NOW_PLAYING_PAUSED
 }

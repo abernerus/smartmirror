@@ -32,7 +32,6 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
 
       ws.onmessage = function(jsonMessage) {
         message = JSON.parse(jsonMessage.data);
-        console.log(message.type);
         if(message) {
           if(message.type == "TRANSPORTS") {
             $rootScope.$broadcast('transportsMessage', {
@@ -45,10 +44,11 @@ smartMirrorServices.factory('VtService', ['$q', '$rootScope', function($q, $root
           } else if(message.type == "TEXT") {
              $rootScope.$broadcast('mirrorMessage', message.content.mirrorMessage);
           } else if(message.type == "WEATHER") {
-              console.log(message.content);
              $rootScope.$broadcast('weatherMessage', message.content);
           } else if(message.type == "NOW_PLAYING") {
              $rootScope.$broadcast('nowPlayingMessage', message.content);
+          } else if(message.type == "NOW_PLAYING_PAUSED") {
+             $rootScope.$broadcast('nowPlayingPausedMessage', message.content);
           } else if(message.type == "TASKS") {
              $rootScope.$broadcast('tasks', message.content);
           }

@@ -5,8 +5,8 @@ import com.bernerus.smartmirror.api.VTTransportList;
 import com.bernerus.smartmirror.dto.VTToken;
 import com.bernerus.smartmirror.model.ApplicationState;
 import com.bernerus.smartmirror.model.VasttrafikTokenStore;
-import se.vasttrafik.api.departures.Departure;
-import se.vasttrafik.api.departures.DepartureBoard;
+import generated.Departure;
+import generated.DepartureBoard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,12 +115,12 @@ public class VasttrafikController {
   }
 
   @Async
-  private Future<List<Departure>> getTransports(String fromId, String toId) {
+  Future<List<Departure>> getTransports(String fromId, String toId) {
     return getTransports(fromId, toId, 1);
   }
 
   @Async
-  private Future<List<Departure>> getTransports(String fromId, String toId, int attempt) {
+  Future<List<Departure>> getTransports(String fromId, String toId, int attempt) {
     VTToken token = tokenStore.getToken();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
@@ -148,7 +148,7 @@ public class VasttrafikController {
       return new AsyncResult<>(responseEntity.getBody().getDeparture());
     } catch (RestClientException e) {
       if (attempt < 3) {
-        log.info("Exception from vasttrafik! Retrying ({}/3)", attempt);
+        log.warn("Exception from vasttrafik! Retrying ({}/3)", attempt);
         return getTransports(fromId, toId, attempt + 1);
       }
       log.error("Exception from vasttrafik! Tried three times, returning empty list...", e);

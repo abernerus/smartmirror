@@ -159,6 +159,7 @@
                     <jvmArguments>
                         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787
                     </jvmArguments>
+                    <addResources>true</addResources>
                 </configuration>
             </plugin>
             <plugin>

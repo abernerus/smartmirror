@@ -65,7 +65,7 @@ public class DisplayRestHandler {
     if (currentHour >= 23 || (currentHour >= 0 && currentHour < 5)) {
       timeoutMinutes = 5;
     }
-    LOG.info("Mirror monitor shutdown scheduled to " + LocalDateTime.now().plusMinutes(timeoutMinutes));
+    LOG.debug("Mirror monitor shutdown scheduled to " + LocalDateTime.now().plusMinutes(timeoutMinutes));
     future = executor.schedule(() -> callMirror(TURN_OFF), timeoutMinutes, TimeUnit.MINUTES);
 
     return response;
@@ -106,13 +106,13 @@ public class DisplayRestHandler {
       return tvServiceController.getStatusRaw();
     }
 
-    LOG.info("Got mirror command: " + command);
+    LOG.debug("Got mirror command: " + command);
     TvServiceStatus mirrorStatus = tvServiceController.getStatus();
     if (mirrorStatus.equals(TvServiceStatus.ON) && TURN_ON.equals(command) && !force) {
-      LOG.info("Got on command but mirror is already on. Ignoring...");
+      LOG.debug("Got on command but mirror is already on. Ignoring...");
       return TvServiceCommandResponse.success("Ignored");
     } else if (mirrorStatus.equals(TvServiceStatus.OFF) && TURN_OFF.equals(command) && !force) {
-      LOG.info("Got off command but mirror is already off. Ignoring...");
+      LOG.debug("Got off command but mirror is already off. Ignoring...");
       return TvServiceCommandResponse.success("Ignored");
     }
 
@@ -137,7 +137,7 @@ public class DisplayRestHandler {
 
   private void cancelFuture(String message) {
     if (future != null && !future.isDone()) {
-      LOG.info(message);
+      LOG.debug(message);
       future.cancel(false);
     }
   }

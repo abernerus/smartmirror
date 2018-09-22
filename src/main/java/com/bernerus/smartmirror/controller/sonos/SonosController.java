@@ -1,4 +1,4 @@
-package com.bernerus.smartmirror.controller;
+package com.bernerus.smartmirror.controller.sonos;
 
 import com.bernerus.smartmirror.dto.sonos.SonosGetPositionInfoResponse;
 import com.bernerus.smartmirror.dto.sonos.SonosTrackMetaData;
@@ -59,7 +59,6 @@ public class SonosController {
   private String sonosPort;
   private String activeSonosUrl;
   private List<String> baseUrls = new ArrayList<>();
-  //private static String  baseUrl = "http://192.168.1.200:1400";
   private JAXBContext getPositionInfoResponseContext;
 
   private static String getSoapBody(String innerBody) {
@@ -123,7 +122,7 @@ public class SonosController {
     SonosGetPositionInfoResponse sonosResponse = (SonosGetPositionInfoResponse) getPositionInfoResponseContext.createUnmarshaller().unmarshal(stream);
     SonosTrackMetaData track = sonosResponse.getTrackMetaData();
     if(StringUtils.isNotEmpty(track.getAlbumArtist())) {
-      return new TrackInfo(track.getAlbum(), track.getAlbumArtist(), track.getTitle());
+      return new TrackInfo(track.getAlbum(), track.getAlbumArtist(), track.getTitle(), sonosResponse.getTrackDuration(), sonosResponse.getRelTime());
     }
     return null;
   }

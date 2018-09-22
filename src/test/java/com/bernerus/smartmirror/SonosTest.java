@@ -1,6 +1,6 @@
 package com.bernerus.smartmirror;
 
-import com.bernerus.smartmirror.controller.SonosController;
+import com.bernerus.smartmirror.controller.sonos.SonosController;
 import com.bernerus.smartmirror.dto.sonos.SonosGetPositionInfoResponse;
 import org.junit.Test;
 

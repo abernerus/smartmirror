@@ -3,6 +3,7 @@ package com.bernerus.smartmirror;
 import com.bernerus.smartmirror.controller.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -19,13 +20,14 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 
 @SpringBootApplication
 @EnableWebSocket
-@ComponentScan
 public class Application extends SpringBootServletInitializer implements WebSocketConfigurer {
-  private static final Logger log = LoggerFactory.getLogger(Application.class);
+
+  @Autowired
+  WebSocketHandler webSocketHandler;
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(myHandler(), "/transportsHandler");
+    registry.addHandler(webSocketHandler, "/transportsHandler");
   }
 
   @Bean
@@ -45,11 +47,6 @@ public class Application extends SpringBootServletInitializer implements WebSock
 //    registry.addHandler(new WebSocketHandler(), "/transportsHandler")
 //      .addInterceptors(new HttpSessionHandshakeInterceptor());
 //  }
-
-  @Bean
-  public WebSocketHandler myHandler() {
-    return new WebSocketHandler();
-  }
 
   @Bean
   public ServletServerContainerFactoryBean createWebSocketContainer() {

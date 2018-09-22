@@ -22,7 +22,7 @@ public class TemperatureRestHandler {
 
   @RequestMapping("/reporttemperature/{temperature}")
   public @ResponseBody String reportTemperature(@PathVariable String temperature) {
-    LOG.info("Received new temperature! (" + temperature + "°C)");
+    LOG.debug("Received new temperature! (" + temperature + "°C)");
     webSocketHandler.sendTemperatureToConsumers(Float.parseFloat(temperature));
     return "OK";
   }
