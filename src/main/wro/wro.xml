@@ -1,9 +1,0 @@
-<groups xmlns="http://www.isdc.ro/wro">
-    <group name="angular-bootstrap">
-        <css>webjar:bootswatch-dist/3.3.5-flatly/css/bootstrap.css</css>
-        <css>file:@project.basedir@/src/main/wro/main.less</css>
-        <js>webjar:jquery/2.1.4/jquery.min.js</js>
-        <js>webjar:angularjs/1.4.8/angular.min.js</js>
-        <js>webjar:angular-route/1.4.8/angular-route.min.js</js>
-    </group>
-</groups>

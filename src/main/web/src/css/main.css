@@ -1,0 +1,10 @@
+body.smartmirror-body {
+    padding: 100px 21px 21px 21px;
+    background-color: black;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: lighter;
+}
+
+.progress {background: rgba(111, 111, 111, 1); border: 0px solid rgba(245, 245, 245, 1); border-radius: 5px; height: 10px;}
+.progress-bar {background: rgba(255, 255, 255, 1);}

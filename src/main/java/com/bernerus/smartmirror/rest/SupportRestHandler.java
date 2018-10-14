@@ -1,7 +1,6 @@
 package com.bernerus.smartmirror.rest;
 
-import com.bernerus.smartmirror.api.VTTransportList;
-import com.bernerus.smartmirror.controller.WeatherController;
+import com.bernerus.smartmirror.controller.weather.WeatherController;
 import com.bernerus.smartmirror.dto.yr.YrWeather;
 import com.bernerus.smartmirror.model.ApplicationState;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.bernerus.smartmirror.model;
 
-import com.bernerus.smartmirror.controller.VasttrafikTokenController;
+import com.bernerus.smartmirror.controller.vasttrafik.VasttrafikTokenController;
 import com.bernerus.smartmirror.dto.VTToken;
 
 /**

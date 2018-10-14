@@ -24,7 +24,7 @@ public class MessageRestHandler {
   @RequestMapping("/message/set/{message}")
   public @ResponseBody String setMessage(@PathVariable String message) {
     LOG.info("Received new message: " + message);
-    webSocketHandler.sendMessageToConsumers(message);
+    webSocketHandler.sendTextMessage(message);
     return "Message Set";
   }
 

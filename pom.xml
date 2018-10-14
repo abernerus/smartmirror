@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.caldav4j</groupId>
+            <artifactId>caldav4j</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
         <!-- Websocket -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -160,104 +166,6 @@
                         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8787
                     </jvmArguments>
                     <addResources>true</addResources>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!-- Serves *only* to filter the wro.xml so it can get an absolute path for the project -->
-                        <id>copy-resources</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/wro</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/wro</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>ro.isdc.wro4j</groupId>
-                <artifactId>wro4j-maven-plugin</artifactId>
-                <version>1.7.9</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
-                    <cssDestinationFolder>${project.build.directory}/generated-resources/static/css</cssDestinationFolder>
-                    <jsDestinationFolder>${project.build.directory}/generated-resources/static/js</jsDestinationFolder>
-                    <wroFile>${project.build.directory}/wro/wro.xml</wroFile>
-                    <extraConfigFile>${basedir}/src/main/wro/wro.properties</extraConfigFile>
-                    <contextFolder>${basedir}/src/main/wro</contextFolder>
-                </configuration>
-                <dependencies>
-                    <!-- Webjars -->
-                    <!-- jquery -->
-                    <dependency>
-                        <groupId>org.webjars</groupId>
-                        <artifactId>jquery</artifactId>
-                        <version>2.1.4</version>
-                    </dependency>
-
-                    <!-- Bootstrap -->
-                    <dependency>
-                        <groupId>org.webjars</groupId>
-                        <artifactId>bootstrap</artifactId>
-                        <version>3.3.6</version>
-                    </dependency>
-
-                    <!-- Angualr -->
-                    <dependency>
-                        <groupId>org.webjars.bower</groupId>
-                        <artifactId>angularjs</artifactId>
-                        <version>1.4.8</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.webjars.bower</groupId>
-                        <artifactId>angular-route</artifactId>
-                        <version>1.4.8</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.webjars.bower</groupId>
-                        <artifactId>bootswatch-dist</artifactId>
-                        <version>3.3.5-flatly</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.webjars</groupId>
-                        <artifactId>angular-ui-bootstrap</artifactId>
-                        <version>0.14.3</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.11</version>
-                <configuration>
-                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                    <dockerDirectory>src/main/docker</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
                 </configuration>
             </plugin>
         </plugins>

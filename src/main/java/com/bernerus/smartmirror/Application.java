@@ -14,6 +14,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
@@ -27,7 +28,7 @@ public class Application extends SpringBootServletInitializer implements WebSock
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(webSocketHandler, "/transportsHandler");
+    registry.addHandler(webSocketHandler, "/transportsHandler").setAllowedOrigins("*");
   }
 
   @Bean
@@ -42,12 +43,6 @@ public class Application extends SpringBootServletInitializer implements WebSock
     return factory;
   }
 
-//  @Override
-//  public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-//    registry.addHandler(new WebSocketHandler(), "/transportsHandler")
-//      .addInterceptors(new HttpSessionHandshakeInterceptor());
-//  }
-
   @Bean
   public ServletServerContainerFactoryBean createWebSocketContainer() {
     ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
@@ -55,6 +50,8 @@ public class Application extends SpringBootServletInitializer implements WebSock
     container.setMaxBinaryMessageBufferSize(8192);
     return container;
   }
+
+
 
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

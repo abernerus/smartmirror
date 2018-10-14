@@ -22,9 +22,7 @@ hs_err_pid*
 *.iml
 
 #generated webapp stuff
-src/main/webapp/components
-src/main/webapp/node
-src/main/webapp/node_modules
+src/main/web/node_modules
 
 smartmirror.log
 smartmirror.*.log

@@ -1,11 +1,9 @@
 package com.bernerus.smartmirror.rest;
 
 import com.bernerus.smartmirror.api.VTTransportList;
-import com.bernerus.smartmirror.controller.VasttrafikController;
+import com.bernerus.smartmirror.controller.vasttrafik.VasttrafikController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
