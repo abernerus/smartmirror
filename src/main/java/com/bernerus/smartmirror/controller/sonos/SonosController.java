@@ -121,8 +121,8 @@ public class SonosController {
     InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     SonosGetPositionInfoResponse sonosResponse = (SonosGetPositionInfoResponse) getPositionInfoResponseContext.createUnmarshaller().unmarshal(stream);
     SonosTrackMetaData track = sonosResponse.getTrackMetaData();
-    if(StringUtils.isNotEmpty(track.getAlbumArtist())) {
-      return new TrackInfo(track.getAlbum(), track.getAlbumArtist(), track.getTitle(), sonosResponse.getTrackDuration(), sonosResponse.getRelTime());
+    if(StringUtils.isNotEmpty(track.getCreator())) {
+      return new TrackInfo(track.getAlbum(), track.getCreator(), track.getTitle(), sonosResponse.getTrackDuration(), sonosResponse.getRelTime());
     }
     return null;
   }
@@ -217,7 +217,7 @@ public class SonosController {
 
   private String readFully(InputStream inputStream)
     throws IOException {
-    return new String(readBytesFully(inputStream), "UTF-8");
+    return new String(readBytesFully(inputStream), StandardCharsets.UTF_8);
   }
 
   public String fixSonosSoapXml(final String soapXml) {

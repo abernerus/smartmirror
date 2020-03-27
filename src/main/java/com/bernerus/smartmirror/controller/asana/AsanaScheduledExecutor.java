@@ -35,12 +35,12 @@ public class AsanaScheduledExecutor extends AbstractScheduledExecutor {
 
     @Override
     protected void run() {
-        AsanaTasks tasks = asanaController.getAsanaTasks();
-        if (!tasks.equals(lastTasks)) {
-            lastTasks = tasks;
-            LOG.debug(tasks.toString());
-            messageSender.send(MessageType.TASKS, tasks.getData());
-        }
+//        AsanaTasks tasks = asanaController.getAsanaTasks();
+//        if (!tasks.equals(lastTasks)) {
+//            lastTasks = tasks;
+//            LOG.debug(tasks.toString());
+//            messageSender.send(MessageType.TASKS, tasks.getData());
+//        }
 
     }
 }

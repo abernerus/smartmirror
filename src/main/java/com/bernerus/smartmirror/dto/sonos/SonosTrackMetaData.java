@@ -18,11 +18,7 @@ public class SonosTrackMetaData {
   @XmlElement
   private String creator;
   @XmlElement
-  private String albumArtist;
-  @XmlElement
   private String album;
-  @XmlElement
-  private String tiid;
 
   public String getAlbumArtURI() {
     return albumArtURI;
@@ -40,15 +36,8 @@ public class SonosTrackMetaData {
     return creator;
   }
 
-  public String getAlbumArtist() {
-    return albumArtist;
-  }
-
   public String getAlbum() {
     return album;
   }
 
-  public String getTiid() {
-    return tiid;
-  }
 }

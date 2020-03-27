@@ -55,13 +55,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        LOG.info("Opened new session in instance " + this);
+        LOG.info("Opened new session in instance ! {}", this);
         this.sessions.put(session.getId(), session);
         this.subscribeForDepartures();
         this.subscribeForWeather();
         this.subscribeForNowPlaying();
         this.subscribeForAsanaTasks();
-        this.sendTextMessage("Subscriptions set up");
+        this.sendTextMessage("Subscriptions set up!");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
         String sessionId = session.getId();
         this.sessions.remove(sessionId);
-        LOG.info("Session with id " + sessionId + " was closed!");
+        LOG.info("Session with id {} was closed!", sessionId);
 
         if (sessions.isEmpty()) {
             LOG.info("All sessions closed.");
